@@ -1,6 +1,6 @@
 import java.util.Objects;
 import java.util.List;
-public class Students {
+public class Aluno {
 
     private String nome;
     private String matricula;
@@ -14,8 +14,8 @@ public class Students {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Students students = (Students) o;
-        return Objects.equals(matricula, students.matricula) && Objects.equals(curso, students.curso) && Objects.equals(campus, students.campus) && Objects.equals(periodo, students.periodo) && Objects.equals(cra, students.cra);
+        Aluno aluno = (Aluno) o;
+        return Objects.equals(matricula, aluno.matricula) && Objects.equals(curso, aluno.curso) && Objects.equals(campus, aluno.campus) && Objects.equals(periodo, aluno.periodo) && Objects.equals(cra, aluno.cra);
     }
 
     @Override
