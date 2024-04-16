@@ -86,7 +86,5 @@ public class Aluno {
         return this.cadeiras;
     }
 
-    public void setCadeiras(List<Cadeira> cadeiras) {
-        this.cadeiras = cadeiras;
-    }
+
 }
