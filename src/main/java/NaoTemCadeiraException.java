@@ -1,2 +1,2 @@
-package PACKAGE_NAME;public class NaoTemCadeiraException {
+public class NaoTemCadeiraException extends Exception{
 }
