@@ -1,11 +1,11 @@
-public class Cadeira {
+public class Turma {
     private String nome;
     private String professor;
     private double nota1;
     private double nota2;
     private double nota3;
 
-    public Cadeira(String nome, String professor) {
+    public Turma(String nome, String professor) {
         this.nome = nome;
         this.professor = professor;
         this.nota1 = 0.0;
