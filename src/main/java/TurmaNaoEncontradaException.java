@@ -1,6 +1,6 @@
-public class NaoTemCadeiraException extends Exception{
+public class TurmaNaoEncontradaException extends Exception{
 
-    public NaoTemCadeiraException(String e) {
+    public TurmaNaoEncontradaException(String e) {
         super(e);
     }
 }
