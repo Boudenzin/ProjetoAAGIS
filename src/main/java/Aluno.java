@@ -4,34 +4,34 @@ import java.util.List;
 public class Aluno {
 
     private String nome;
+    private double media;
+    private double nota1;
+    private double nota2;
+    private double nota3;
     private String matricula;
     private String curso;
-    private String campus;
-    private String periodo;
-    private double cra;
-    private List<Cadeira> cadeiras;
 
-    public Aluno(String nome, String matricula, String curso, String campus, String periodo, double cra) {
+
+    public Aluno(String nome, String matricula, String curso) {
         this.nome = nome;
+        this.nota1 = 0.0;
+        this.nota2 = 0.0;
+        this.nota3 = 0.0;
+        this.media = calcularMedia();
         this.matricula = matricula;
         this.curso = curso;
-        this.campus = campus;
-        this.periodo = periodo;
-        this.cra = cra;
-        this.cadeiras = new ArrayList<>();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Aluno aluno = (Aluno) o;
-        return Objects.equals(matricula, aluno.matricula) && Objects.equals(curso, aluno.curso) && Objects.equals(campus, aluno.campus) && Objects.equals(periodo, aluno.periodo) && Objects.equals(cra, aluno.cra);
+        if (!(o instanceof Aluno aluno)) return false;
+        return Objects.equals(nome, aluno.nome) && Objects.equals(matricula, aluno.matricula) && Objects.equals(curso, aluno.curso);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(matricula, curso, campus, periodo, cra);
+        return Objects.hash(nome, matricula, curso);
     }
 
     public String getNome() {
@@ -58,33 +58,33 @@ public class Aluno {
         this.curso = curso;
     }
 
-    public String getCampus() {
-        return this.campus;
+    public void setNota1(double nota1) {
+        this.nota1 = nota1;
     }
 
-    public void setCampus(String campus) {
-        this.campus = campus;
+    public void setNota2(double nota2) {
+        this.nota2 = nota2;
     }
 
-    public String getPeriodo() {
-        return this.periodo;
+    public void setNota3(double nota3) {
+        this.nota3 = nota3;
     }
 
-    public void setPeriodo(String periodo) {
-        this.periodo = periodo;
+    public double getNota1() {
+        return this.nota1;
     }
 
-    public double getCra() {
-        return this.cra;
+    public double getNota2() {
+        return this.nota2;
     }
 
-    public void setCra(double cra) {
-        this.cra = cra;
+    public double getNota3() {
+        return this.nota3;
     }
 
-    public List<Cadeira> getCadeiras() {
-        return this.cadeiras;
+    public double calcularMedia() {
+        return (this.nota1 + this.nota2 + this.nota3)/3;
     }
-
-
 }
+
+
