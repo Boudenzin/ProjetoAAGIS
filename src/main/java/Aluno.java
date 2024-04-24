@@ -1,6 +1,4 @@
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.List;
 public class Aluno {
 
     private String nome;
@@ -26,8 +24,9 @@ public class Aluno {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Aluno aluno)) return false;
-        return Objects.equals(nome, aluno.nome) && Objects.equals(matricula, aluno.matricula) && Objects.equals(curso, aluno.curso);
+        return Objects.equals(matricula, aluno.matricula);
     }
+
 
     @Override
     public int hashCode() {
@@ -85,6 +84,10 @@ public class Aluno {
     public double calcularMedia() {
         return (this.nota1 + this.nota2 + this.nota3)/3;
     }
+
+    public String toString(){
+        return String.format("""
+                Aluno: %s   Matricula: %s   Curso: %s   /   Nota 1: %.1f    Nota 2: %.1f    Nota3: %.1f
+                """, this.nome, this.matricula, this.curso, this.nota1, this.nota2, this.nota3);
+    }
 }
-
-

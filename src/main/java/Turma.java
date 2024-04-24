@@ -1,5 +1,7 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
+
 public class Turma {
 
     private String nome;
@@ -12,6 +14,22 @@ public class Turma {
         this.docente = docente;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Turma turma = (Turma) o;
+        return Objects.equals(nome, turma.nome) && Objects.equals(docente, turma.docente);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(nome);
+        result = 31 * result + Objects.hashCode(docente);
+        return result;
+    }
+
     public void addAluno(Aluno aluno) {
         if (!alunos.contains(aluno)) {
             alunos.add(aluno);
@@ -22,11 +40,7 @@ public class Turma {
     }
 
     public void removeAluno(Aluno aluno) {
-        if (alunos.contains(aluno)) {
-            alunos.remove(aluno);
-        } else {
-            System.out.println("Aluno " + aluno.getNome() + " não está na turma " + nome);
-        }
+        alunos.remove(aluno);
     }
 
     public Aluno getAluno(String nome) throws AlunoNaoEncontradoException{

@@ -1,49 +1,106 @@
+import java.util.ArrayList;
 import java.util.List;
 public class TurmaList implements TurmaInterface {
 
     private List<Turma> turmas;
 
+    public TurmaList(){
+        turmas = new ArrayList<>();
+    }
+
     public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException {
-        if (turmas.contains(turma)) {
+        if (!turmas.contains(turma)) {
+            turmas.add(turma);
+        } else {
             throw new TurmaJaCriadaException("Turma já cadastrada no sistema com essas credenciais");
         }
-
-        turmas.add(turma);
     }
 
-    public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) {
-        // Valida dados de entrada (nome do aluno, nome da turma)
-        // Cria uma nova turma com o nome informado
-        // Adiciona o aluno à nova turma
+    public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException {
+        Turma turma = null;
         for (Turma t : turmas) {
             if (t.getNome().equalsIgnoreCase(nomeTurma)) {
-                t.addAluno(aluno);
+                turma = t;
+                break;
             }
         }
+        if (turma == null){
+            throw new TurmaNaoEncontradaException("Turma de nome "+ nomeTurma +" não encontrada.");
+        }
+
+        if (turma.getAlunos().contains(aluno)){
+            throw new AlunoJaCadastradoException("Aluno de matricula '"+ aluno.getMatricula() +"' já cadastrado na turma '"+ nomeTurma +"'");
+        }
+
+        turma.addAluno(aluno);
     }
 
+    public void removerAlunoDaTurma(String matricula, String nomeTurma) throws AlunoNaoEncontradoException, TurmaNaoEncontradaException{
+        Turma turma = null;
+        Aluno aluno = null;
+        for (Turma t : turmas) {
+            if (t.getNome().equalsIgnoreCase(nomeTurma)) {
+                turma = t;
+                break;
+            }
+        }
+        if (turma == null){
+            throw new TurmaNaoEncontradaException("Turma de nome '"+ nomeTurma +"' não encontrada.");
+        }
 
-/*
+        for (Aluno a: turma.getAlunos()){
+            if (a.getMatricula().equals(matricula)){
+                aluno = a;
+            }
+        }
 
-    //public Aluno buscarAlunoPorMatricula(String matricula, String nomeTurma) {
-        // Valida dados de entrada (nome da turma, matrícula)
-        // Busca a turma pelo nome
-        // Busca o aluno na turma pela matrícula
-        // Retorna o objeto Aluno se encontrado, null caso contrário
+        if (aluno == null){
+            throw new AlunoNaoEncontradoException("Aluno de matrícula '"+matricula+"' não encontrado na Turma "+nomeTurma);
+        }
+
+        turma.removeAluno(aluno);
     }
 
-    public boolean verificarExistenciaAluno(String matricula, String nomeTurma) {
-        // Valida dados de entrada (nome da turma, matrícula)
-        // Busca a turma pelo nome
-        // Verifica se o aluno já está na turma
-        // Retorna true se o aluno estiver na turma, false caso contrário
+    public void alterarNotasDoAluno(Aluno aluno, double n1, double n2, double n3){
+        aluno.setNota1(n1);
+        aluno.setNota2(n2);
+        aluno.setNota3(n3);
     }
 
-    public List<Aluno> listarAlunosDaTurma(String nomeTurma) {
-        // Valida dados de entrada (nome da turma)
-        // Busca a turma pelo nome
-        // Retorna a lista de alunos da turma, lista vazia caso não existam alunos
+    public Aluno buscarAlunoPorMatricula(String matricula, String nomeTurma) throws AlunoNaoEncontradoException, TurmaNaoEncontradaException {
+        Turma turma = null;
+        for (Turma t : turmas) {
+            if (t.getNome().equalsIgnoreCase(nomeTurma)) {
+                turma = t;
+                break;
+            }
+        }
+        if (turma == null){
+            throw new TurmaNaoEncontradaException("Turma de nome '"+ nomeTurma +"' não encontrada.");
+        }
+
+        for (Aluno a: turma.getAlunos()){
+            if (a.getMatricula().equals(matricula)){
+                return a;
+            }
+        }
+
+        throw new AlunoNaoEncontradoException("Aluno de matrícula '"+matricula+"' não encontrado");
+
     }
 
-     */
+    public List<Aluno> listarAlunosDaTurma(String nomeTurma) throws TurmaNaoEncontradaException {
+        Turma turma = null;
+        for (Turma t: turmas){
+            if (t.getNome().equalsIgnoreCase(nomeTurma)){
+                turma = t;
+            }
+        }
+
+        if (turma == null){
+            throw new TurmaNaoEncontradaException("Turma de nome '"+ nomeTurma +"' não encontrada.");
+        } else {
+            return turma.getAlunos();
+        }
+    }
 }
