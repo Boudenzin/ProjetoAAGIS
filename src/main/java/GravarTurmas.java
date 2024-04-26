@@ -4,6 +4,13 @@ import java.util.List;
 
 public class GravarTurmas {
 
+  public static final String ARQUIVO_TURMAS = "turmas.txt";
+
+  public List<String> recuperaDadosDeTurma () throws IOException {
+    List<String> dadosTurma = recuperaTextoEmArquivo (ARQUIVO_TURMAS);
+    return dadosTurma;
+  }
+
 
   
   public List<String> recuperaTextoEmArquivo (String nomeArquivo) throws IOException{
