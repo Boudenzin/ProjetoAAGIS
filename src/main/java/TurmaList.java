@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 public class TurmaList implements TurmaInterface {
@@ -7,7 +8,23 @@ public class TurmaList implements TurmaInterface {
 
     public TurmaList(){
         turmas = new ArrayList<>();
-        this.gravarTurmas = new GravarTurmas;
+        this.gravarTurmas = new GravarTurmas();
+    }
+
+    public void recuperaDadosEmTurma() throws IOException {
+        List<String> dadosTurma = gravarTurmas.recuperaDadosDeTurma();
+        for (String dadoTurma: dadosTurma){
+            String [] dados = dadoTurma.split("###");
+            Turma T = new Turma(dados[0],dados[1]);
+            this.turmas.add(T);
+        }
+    }
+
+    public void gravaDadomaEmTurma() throws IOException {
+        List<String> dadosAlunos = new ArrayList<>();
+        for (Turma t : this.turmas){
+            String dado = t.getNome()+"###"+t.getDocente();
+        }
     }
 
     public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException {

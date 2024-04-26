@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.List;
 public interface TurmaInterface {
     public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException;
@@ -11,4 +12,8 @@ public interface TurmaInterface {
     public List<Aluno> listarAlunosDaTurma(String nomeTurma) throws TurmaNaoEncontradaException;
 
     //public boolean verificarExistenciaAluno(String matricula, String nomeTurma);
+
+    public void recuperaDadosEmTurma() throws IOException;
+
+    public void gravaDadomaEmTurma() throws IOException;
 }

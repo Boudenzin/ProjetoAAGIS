@@ -58,6 +58,9 @@ public class Turma {
     public String getNome() {
         return this.nome;
     }
+    public String getDocente() {
+        return this.docente;
+    }
 
     public void setNome(String nome) {
         this.nome = nome;
@@ -65,4 +68,3 @@ public class Turma {
 
 
 }
-
