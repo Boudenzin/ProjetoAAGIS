@@ -20,7 +20,7 @@ public class Turma {
         if (o == null || getClass() != o.getClass()) return false;
 
         Turma turma = (Turma) o;
-        return Objects.equals(nome, turma.nome) && Objects.equals(docente, turma.docente);
+        return Objects.equals(nome, turma.nome);
     }
 
     @Override
