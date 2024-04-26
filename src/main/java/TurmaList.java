@@ -3,11 +3,11 @@ import java.util.List;
 public class TurmaList implements TurmaInterface {
 
     private List<Turma> turmas;
-    GravadorDeDados gravarTurmas;
+    GravarTurmas gravarTurmas;
 
     public TurmaList(){
         turmas = new ArrayList<>();
-        this.gravadorDeDados = new GravadorDeDados;
+        this.gravarTurmas = new GravarTurmas;
     }
 
     public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException {
