@@ -12,6 +12,10 @@ public class GravarTurmas {
         return dadosTurma;
     }
 
+    public void gravaDadosDeTurmas(List<String> dadosDeTurmas) throws IOException{
+        this.gravaTextoEmArquivo(dadosDeTurmas, ARQUIVO_TURMA);
+    }
+
     public List<String> recuperaTextoDoArquivo(String nomeArquivo) throws IOException {
         BufferedReader leitor = null;
         List<String> textoLido = new ArrayList<String>();
