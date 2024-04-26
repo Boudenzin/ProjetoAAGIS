@@ -3,6 +3,8 @@ import java.util.List;
 public interface TurmaInterface {
     public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException;
 
+    public void removerTurma(String nomeTurma) throws TurmaNaoEncontradaException;
+
     public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException;
 
     public void removerAlunoDaTurma(String matricula, String nomeTurma) throws AlunoNaoEncontradoException, TurmaNaoEncontradaException;
@@ -11,9 +13,8 @@ public interface TurmaInterface {
 
     public List<Aluno> listarAlunosDaTurma(String nomeTurma) throws TurmaNaoEncontradaException;
 
-    //public boolean verificarExistenciaAluno(String matricula, String nomeTurma);
 
     public void recuperaDadosEmTurma() throws IOException;
 
-    public void gravaDadomaEmTurma() throws IOException;
+    public void gravaDadosEmTurma() throws IOException;
 }
