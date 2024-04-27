@@ -3,6 +3,10 @@ import java.util.List;
 public interface TurmaSistema {
     public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException;
 
+    public Turma buscarTurma(String nomeTurma) throws TurmaNaoEncontradaException;
+
+    public Aluno buscarAluno(String matricula, Turma turma) throws AlunoNaoEncontradoException;
+
     public void removerTurma(String nomeTurma) throws TurmaNaoEncontradaException;
 
     public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException;
@@ -14,7 +18,15 @@ public interface TurmaSistema {
     public List<Aluno> listarAlunosDaTurma(String nomeTurma) throws TurmaNaoEncontradaException;
 
 
-    public void recuperaDadosEmTurma() throws IOException;
 
-    public void gravaDadosEmTurma() throws IOException;
+
+    public List<Turma> recuperaTurma() throws IOException;
+
+    public void recuperaAlunos() throws IOException, AlunoJaCadastradoException, TurmaNaoEncontradaException;
+
+    public void gravaAlunos() throws IOException;
+
+    public void gravaTurmas() throws IOException;
+
+
 }
