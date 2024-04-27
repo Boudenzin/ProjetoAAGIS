@@ -30,12 +30,11 @@ public class Turma {
         return result;
     }
 
-    public void addAluno(Aluno aluno) {
+    public void addAluno(Aluno aluno) throws AlunoJaCadastradoException {
         if (!alunos.contains(aluno)) {
             alunos.add(aluno);
-            System.out.println("Aluno cadastrado com sucesso");
         } else {
-            System.out.println("Aluno " + aluno.getNome() + " já está na turma " + nome);
+            throw new AlunoJaCadastradoException("Aluno " + aluno.getNome() + " já está na turma " + nome);
         }
     }
 
