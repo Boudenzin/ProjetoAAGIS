@@ -6,10 +6,24 @@ public class AagisProgram {
     public static void main(String[] args) {
         TurmaList sistemaTurmas = new TurmaList();
         try {
-            sistemaTurmas.recuperaDadosEmTurma();
-            JOptionPane.showMessageDialog(null, "Dados de Turmas recuperados com sucesso.");
+            List<Turma> turmas = sistemaTurmas.recuperaTurma();
+            for (Turma t : turmas) {
+                try {
+                    sistemaTurmas.cadastrarNovaTurma(t);
+                } catch (TurmaJaCriadaException e) {
+                    JOptionPane.showMessageDialog(null, "Dados de Turmas não puderam ser recuperados. Sistema iniciando sem nenhuma Turma.");
+                }
+            }
+
         } catch (IOException e){
             JOptionPane.showMessageDialog(null, "Dados de Turmas não puderam ser recuperados. Sistema iniciando sem nenhuma Turma.");
+        }
+        try {
+            sistemaTurmas.recuperaAlunos();
+        } catch (AlunoJaCadastradoException | TurmaNaoEncontradaException e) {
+            JOptionPane.showMessageDialog(null, "Alguns dados de Alunos foram corrompidos.");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null,"Dados de Alunos não puderam ser recuperados. Sistema iniciando sem nenhum aluno");
         }
 
         String menu = """
@@ -114,7 +128,12 @@ public class AagisProgram {
                 case "7":
                     continuar = false;
                     try {
-                        sistemaTurmas.gravaDadosEmTurma();
+                        sistemaTurmas.gravaTurmas();
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(null, "Não foi possível salvar os dados de Turmas.");
+                    }
+                    try {
+                        sistemaTurmas.gravaAlunos();
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(null, "Não foi possível salvar os dados de Turmas.");
                     }
