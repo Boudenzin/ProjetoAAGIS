@@ -35,7 +35,11 @@ public class TurmaList implements TurmaSistema {
     }
 
 
-    public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException {
+    public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException, NullPointerException {
+        if (turma.getNome().isEmpty() || turma.getDocente().isEmpty()) {
+            throw new NullPointerException("Entrada Inválida. Tente Novamente");
+        }
+
         if (!turmas.contains(turma)) {
             turmas.add(turma);
         } else {

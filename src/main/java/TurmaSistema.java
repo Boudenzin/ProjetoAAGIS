@@ -1,7 +1,7 @@
 import java.io.IOException;
 import java.util.List;
 public interface TurmaSistema {
-    public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException;
+    public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException, NullPointerException;
 
     public Turma buscarTurma(String nomeTurma) throws TurmaNaoEncontradaException;
 

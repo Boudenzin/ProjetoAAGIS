@@ -55,7 +55,7 @@ public class AagisProgram {
                         Turma novaTurma = new Turma(nomeTurma, nomeDocente);
                         sistemaTurmas.cadastrarNovaTurma(novaTurma);
                         JOptionPane.showMessageDialog(null, "Turma cadastrada com sucesso.");
-                    } catch (TurmaJaCriadaException e) {
+                    } catch (TurmaJaCriadaException | NullPointerException e) {
                         JOptionPane.showMessageDialog(null, e.getMessage());
                     }
                     break;
@@ -95,7 +95,7 @@ public class AagisProgram {
                 case "4":
                     try {
                         nomeTurma = JOptionPane.showInputDialog("Digite o nome da turma");
-                        matricula = JOptionPane.showInputDialog("Digite o matricula do(a) aluno(a) que deseja remover");
+                        matricula = JOptionPane.showInputDialog("Digite a matricula do(a) aluno(a) que deseja remover");
                         sistemaTurmas.removerAlunoDaTurma(matricula, nomeTurma);
                         JOptionPane.showMessageDialog(null, "Aluno removido com sucesso");
                     } catch (TurmaNaoEncontradaException | AlunoNaoEncontradoException e) {
@@ -141,7 +141,7 @@ public class AagisProgram {
                     break;
 
                 default:
-                    JOptionPane.showMessageDialog(null, "Opção inválida. Tente novamente,,,,");
+                    JOptionPane.showMessageDialog(null, "Opção inválida. Tente novamente");
                     break;
             }
         }
