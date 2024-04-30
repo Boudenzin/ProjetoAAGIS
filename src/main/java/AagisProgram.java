@@ -69,7 +69,7 @@ public class AagisProgram {
                         Aluno novoAluno = new Aluno(nomeAluno, matricula, curso);
                         sistemaTurmas.cadastrarAlunoNaTurma(novoAluno, nomeTurma);
                         JOptionPane.showMessageDialog(null, "Aluno cadastrado com sucesso.");
-                    } catch (TurmaNaoEncontradaException | AlunoJaCadastradoException e) {
+                    } catch (TurmaNaoEncontradaException | AlunoJaCadastradoException | NullPointerException e) {
                         JOptionPane.showMessageDialog(null, e.getMessage());
                     }
                     break;

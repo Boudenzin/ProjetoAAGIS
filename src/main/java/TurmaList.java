@@ -58,7 +58,10 @@ public class TurmaList implements TurmaSistema {
     }
 
 
-    public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException {
+    public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException, NullPointerException {
+        if (aluno.getNome().isEmpty() || aluno.getMatricula().isEmpty() || aluno.getCurso().isEmpty()){
+            throw new NullPointerException("Entrada Inválida. Tente Novamente");
+        }
         try {
             Turma turma = buscarTurma(nomeTurma);
 

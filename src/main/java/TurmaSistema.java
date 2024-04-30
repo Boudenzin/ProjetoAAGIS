@@ -9,7 +9,7 @@ public interface TurmaSistema {
 
     public void removerTurma(String nomeTurma) throws TurmaNaoEncontradaException;
 
-    public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException;
+    public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException, NullPointerException;
 
     public void removerAlunoDaTurma(String matricula, String nomeTurma) throws AlunoNaoEncontradoException, TurmaNaoEncontradaException;
 
