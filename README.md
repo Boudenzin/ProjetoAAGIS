@@ -56,20 +56,17 @@ ProjetoAAGIS/
 1. Clone o repositório:
    ```bash
    git clone https://github.com/Boudenzin/ProjetoAAGIS.git
-2. **Clone o repositório**:
-   ```bash
-   git clone https://github.com/Boudenzin/ProjetoAAGIS.git
-3. **Navegue até o diretório do projeto**:
+2. **Navegue até o diretório do projeto**:
   ```bash
-    git clone https://github.com/Boudenzin/ProjetoAAGIS.git
+    cd ProjetoAAGIS
   ```
 
-4. **Compile o projeto**:
+3. **Compile o projeto**:
   ```bash
     javac src/main/java/*.java -d out
   ```
 
-5. **Execute o programa**:
+4. **Execute o programa**:
    ```bash
    java -cp out AagisProgram
    ```
