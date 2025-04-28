@@ -17,14 +17,7 @@ public interface TurmaSistema {
 
     public List<Aluno> listarAlunosDaTurma(String nomeTurma) throws TurmaNaoEncontradaException;
 
-
-
-
     public List<Turma> recuperaTurma() throws IOException;
-
-    public void recuperaAlunos() throws IOException, AlunoJaCadastradoException, TurmaNaoEncontradaException;
-
-    public void gravaAlunos() throws IOException;
 
     public void gravaTurmas() throws IOException;
 
