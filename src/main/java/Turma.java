@@ -1,17 +1,18 @@
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Turma {
+public class Turma implements Serializable {
 
     private String nome;
-    private String docente;
+    private Professor professor;
     private List<Aluno> alunos;
 
-    public Turma(String nome, String docente) {
+    public Turma(String nome, Professor professor) {
         this.nome = nome;
         this.alunos = new ArrayList<>();
-        this.docente = docente;
+        this.professor = professor;
     }
 
 
@@ -27,10 +28,9 @@ public class Turma {
 
     @Override
     public int hashCode() {
-        int result = Objects.hashCode(nome);
-        result = 31 * result + Objects.hashCode(docente);
-        return result;
+        return Objects.hash(nome);
     }
+
 
     public void addAluno(Aluno aluno) throws AlunoJaCadastradoException {
         if (!alunos.contains(aluno)) {
@@ -59,9 +59,10 @@ public class Turma {
     public String getNome() {
         return this.nome;
     }
-    public String getDocente() {
-        return this.docente;
+    public Professor getProfessor() {
+        return professor;
     }
+
 
     public void setNome(String nome) {
         this.nome = nome;
