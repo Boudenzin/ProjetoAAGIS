@@ -1,15 +1,21 @@
 import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 public class Aluno {
 
     private String nome;
     private String matricula;
     private String curso;
+    private Map <String, Double> notas;
+    private Map <String, Integer> frequencias;
 
 
     public Aluno(String nome, String matricula, String curso) {
         this.nome = nome;
         this.matricula = matricula;
         this.curso = curso;
+        this.notas = new HashMap<>();
+        this.frequencias = new HashMap<>();
     }
 
     @Override
@@ -49,7 +55,20 @@ public class Aluno {
         this.curso = curso;
     }
 
+    public void adicionarNota(String disciplina, double nota) {
+        notas.put(disciplina, nota);
+    }
 
+    public double getNota(String disciplina) {
+        return notas.getOrDefault(disciplina, 0.0);
+    }
+
+    public int getFrequencia(String disciplina) {
+        return frequencias.getOrDefault(disciplina, 0);
+    }
+    public void registrarFrequencia(String disciplina, int frequencia) {
+        frequencias.put(disciplina, frequencias.getOrDefault(disciplina, 0) + 1);
+    }
 
     public String toString(){
         return String.format("""
