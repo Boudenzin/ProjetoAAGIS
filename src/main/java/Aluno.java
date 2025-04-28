@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.HashMap;
 import java.util.Map;
-public class Aluno {
+public class Aluno implements Serializable {
 
     private String nome;
     private String matricula;
