@@ -1,47 +1,25 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GravadorDeDados {
+public class GravadorDeDados<T> implements GravadorInterface<T> {
 
-
-    public void gravaTextoEmArquivo(List<String> texto, String nomeArquivo) throws IOException {
-        BufferedWriter gravador = null;
-        try {
-            gravador = new BufferedWriter(new FileWriter(nomeArquivo));
-            for (String s : texto) {
-                gravador.write(s + "\n");
-            }
-        } finally {
-            if (gravador != null) {
-                gravador.close();
-            }
+    @Override
+    public void gravar(List<T> lista, String arquivo) throws IOException {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(arquivo))) {
+            out.writeObject(lista);
         }
     }
 
-    public List<String> recuperaTextoDeArquivo(String nomeArquivo) throws IOException {
-        BufferedReader leitor = null;
-        List<String> textoLido = new ArrayList<String>();
-        try {
-            leitor = new BufferedReader(new FileReader(nomeArquivo));
-            String texto = null;
-            do {
-                texto = leitor.readLine();
-
-                if (texto != null) {
-                    textoLido.add(texto);
-                }
-            } while (texto != null);
-        } finally {
-            if (leitor != null) {
-                leitor.close();
-            }
+    @Override
+    public List<T> recuperar(String arquivo) throws IOException, ClassNotFoundException {
+        File file = new File(arquivo);
+        if (!file.exists()) {
+            return new ArrayList<>(); // Retorna lista vazia se arquivo não existir ainda
         }
-        return textoLido;
-    }
 
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            return (List<T>) in.readObject();
+        }
+    }
 }
