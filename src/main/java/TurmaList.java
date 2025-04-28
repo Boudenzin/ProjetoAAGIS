@@ -2,182 +2,97 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 public class TurmaList implements TurmaSistema {
 
     private List<Turma> turmas;
-    private static final String ARQUIVOS_ALUNOS = "alunos.txt";
-    private static final String ARQUIVOS_TURMAS = "turmas.txt";
-    GravadorDeDados gravador;
+    private static final String ARQUIVO_TURMAS = "turmas.dat";
+    private GravadorInterface<Turma> gravador;
 
     public TurmaList() {
-        turmas = new ArrayList<>();
-        this.gravador = new GravadorDeDados();
+        this.turmas = new ArrayList<>();
+        this.gravador = new GravadorDeDados<>();
     }
 
-
+    @Override
     public Turma buscarTurma(String nomeTurma) throws TurmaNaoEncontradaException {
-        for (Turma t : turmas) {
-            if (t.getNome().equalsIgnoreCase(nomeTurma)) {
-                return t;
-            }
-        }
-        throw new TurmaNaoEncontradaException("Turma não encontrada");
+        return turmas.stream()
+                .filter(t -> t.getNome().equalsIgnoreCase(nomeTurma))
+                .findFirst()
+                .orElseThrow(() -> new TurmaNaoEncontradaException("Turma '" + nomeTurma + "' não encontrada"));
     }
 
-
-    public Aluno buscarAluno(String matricula, Turma turma) throws AlunoNaoEncontradoException{
-        for (Aluno a : turma.getAlunos()) {
-            if (a.getMatricula().equals(matricula)) {
-                return a;
-            }
-        }
-        throw new AlunoNaoEncontradoException("Aluno não Encontrado");
+    @Override
+    public Aluno buscarAluno(String matricula, Turma turma) throws AlunoNaoEncontradoException {
+        return turma.getAlunos().stream()
+                .filter(a -> a.getMatricula().equals(matricula))
+                .findFirst()
+                .orElseThrow(() -> new AlunoNaoEncontradoException("Aluno de matrícula '" + matricula + "' não encontrado"));
     }
 
-
-    public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException, NullPointerException {
-        if (turma.getNome().isEmpty() || turma.getDocente().isEmpty()) {
-            throw new NullPointerException("Entrada Inválida. Tente Novamente");
+    public void cadastrarNovaTurma(Turma turma) throws TurmaJaCriadaException {
+        if (turmas.contains(turma)) {
+            throw new TurmaJaCriadaException("Turma '" + turma.getNome() + "' já cadastrada.");
         }
-
-        if (!turmas.contains(turma)) {
-            turmas.add(turma);
-        } else {
-            throw new TurmaJaCriadaException("Turma de '" + turma.getNome() + "' já cadastrada no sistema.");
-        }
+        turmas.add(turma);
     }
 
-
+    @Override
     public void removerTurma(String nomeTurma) throws TurmaNaoEncontradaException {
-        try {
-            Turma turma = buscarTurma(nomeTurma);
-            turmas.remove(turma);
-        } catch (TurmaNaoEncontradaException e) {
-            throw new TurmaNaoEncontradaException(e.getMessage());
-        }
+        Turma turma = buscarTurma(nomeTurma);
+        turmas.remove(turma);
     }
 
-
-    public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException, NullPointerException {
-        if (aluno.getNome().isEmpty() || aluno.getMatricula().isEmpty() || aluno.getCurso().isEmpty()){
-            throw new NullPointerException("Entrada Inválida. Tente Novamente");
-        }
-        try {
-            Turma turma = buscarTurma(nomeTurma);
-
-            try {
-                turma.addAluno(aluno);
-            } catch (AlunoJaCadastradoException e) {
-                throw new AlunoJaCadastradoException(e.getMessage());
-            }
-
-        } catch (TurmaNaoEncontradaException e) {
-            throw new TurmaNaoEncontradaException(e.getMessage());
+    @Override
+    public void cadastrarAlunoNaTurma(Aluno aluno, String nomeTurma) throws AlunoJaCadastradoException, TurmaNaoEncontradaException {
+        if (aluno == null || aluno.getNome() == null || aluno.getNome().isEmpty()
+                || aluno.getMatricula() == null || aluno.getMatricula().isEmpty()
+                || aluno.getCurso() == null || aluno.getCurso().isEmpty()) {
+            throw new IllegalArgumentException("Dados do aluno inválidos.");
         }
 
+        Turma turma = buscarTurma(nomeTurma);
+        turma.addAluno(aluno);
+
         try {
-            this.gravaAlunos();
+            gravaTurmas();  // Aqui salva todas as turmas + seus alunos no arquivo
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null,"Dados não gravados");
+            JOptionPane.showMessageDialog(null, "Erro ao salvar turmas: " + e.getMessage());
         }
     }
 
 
+    @Override
     public void removerAlunoDaTurma(String matricula, String nomeTurma) throws AlunoNaoEncontradoException, TurmaNaoEncontradaException {
         Turma turma = buscarTurma(nomeTurma);
-        if (turma == null) {
-            throw new TurmaNaoEncontradaException("Turma de nome '" + nomeTurma + "' não encontrada.");
-        }
         Aluno aluno = buscarAluno(matricula, turma);
-        if (aluno == null) {
-            throw new AlunoNaoEncontradoException("Aluno de matrícula '" + matricula + "' não encontrado na Turma " + nomeTurma);
-        }
         turma.removeAluno(aluno);
     }
 
-
+    @Override
     public Aluno buscarAlunoPorMatricula(String matricula, String nomeTurma) throws AlunoNaoEncontradoException, TurmaNaoEncontradaException {
         Turma turma = buscarTurma(nomeTurma);
-        if (turma == null) {
-            throw new TurmaNaoEncontradaException("Turma de nome '" + nomeTurma + "' não encontrada.");
-        }
-        Aluno aluno = buscarAluno(matricula, turma);
-        if (aluno == null) {
-            throw new AlunoNaoEncontradoException("Aluno de matrícula '" + matricula + "' não encontrado");
-        }
-        return aluno;
+        return buscarAluno(matricula, turma);
     }
 
-
+    @Override
     public List<Aluno> listarAlunosDaTurma(String nomeTurma) throws TurmaNaoEncontradaException {
         Turma turma = buscarTurma(nomeTurma);
-        if (turma == null) {
-            throw new TurmaNaoEncontradaException("Turma de nome '" + nomeTurma + "' não encontrada.");
-        }
         return turma.getAlunos();
     }
 
-
+    @Override
     public List<Turma> recuperaTurma() throws IOException {
-
-        List<Turma> listaRetornadaDeTurma = new ArrayList<>();
-
-        for (String dado : gravador.recuperaTextoDeArquivo(ARQUIVOS_TURMAS)) {
-            String[] dadosTurmas = dado.split("###");
-
-            Turma turma = new Turma(dadosTurmas[0], dadosTurmas[1]);
-            listaRetornadaDeTurma.add(turma);
-
-        }
-
-        return listaRetornadaDeTurma;
-
-    }
-    public void recuperaAlunos() throws IOException, AlunoJaCadastradoException, TurmaNaoEncontradaException {
-
-        List<Turma> listaRetornadaDeAluno = new ArrayList<>();
-
         try {
-            for (String dado : gravador.recuperaTextoDeArquivo(ARQUIVOS_ALUNOS)) {
-                String[] dadosAlunos = dado.split("###");
-
-                try {
-                    this.cadastrarAlunoNaTurma(new Aluno(dadosAlunos[1], dadosAlunos[2], dadosAlunos[3]), dadosAlunos[0]);
-                } catch (TurmaNaoEncontradaException e) {
-                    throw new TurmaNaoEncontradaException(e.getMessage());
-                } catch (AlunoJaCadastradoException e) {
-                    throw new AlunoJaCadastradoException(e.getMessage());
-                }
-
-            }
-        } catch (IOException e) {
-            throw new IOException(e.getMessage());
+            this.turmas = gravador.recuperar(ARQUIVO_TURMAS);
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Erro ao ler turmas do arquivo.", e);
         }
+        return turmas;
     }
+
 
     public void gravaTurmas() throws IOException {
-
-        List<String> turmas = new ArrayList<>();
-        String turma = "";
-        for (Turma t : this.turmas) {
-            turma = t.getNome() + "###" + t.getDocente();
-            turmas.add(turma);
-        }
-
-        gravador.gravaTextoEmArquivo(turmas, ARQUIVOS_TURMAS);
+        gravador.gravar(turmas, ARQUIVO_TURMAS);
     }
-
-    public void gravaAlunos() throws IOException {
-
-        List<String> alunos = new ArrayList<>();
-        String aluno = "";
-        for (Turma t : this.turmas) {
-            for (Aluno a : t.getAlunos()) {
-                aluno = t.getNome() + "###" + a.getNome() + "###" + a.getMatricula() + "###" + a.getCurso();
-                alunos.add(aluno);
-            }
-            gravador.gravaTextoEmArquivo(alunos, ARQUIVOS_ALUNOS);
-        }
-    }
-
 }
