@@ -1,11 +1,9 @@
 package gui;
 import javax.swing.*;
 import components.TurmaSistema;
-import components.TurmaList;
 public class AreaProfessor extends JFrame {
-    private TurmaSistema sistema = new TurmaList();
 
-    public AreaProfessor() {
+    public AreaProfessor(TurmaSistema sistema) {
         setTitle("Área do Professor");
         setSize(400, 300);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -17,47 +15,45 @@ public class AreaProfessor extends JFrame {
         JButton btnConsultarAluno = new JButton("Consultar Aluno");
         JButton btnListarAlunos = new JButton("Listar Alunos da Turma");
         JButton btnCadastrarNota = new JButton("Cadastrar Nota");
-        JButton btnCadastrarFaltas = new JButton("Cadastrar Faltas");
+        JButton btnCadastrarPresenca = new JButton("Cadastrar Faltas");
         JButton btnVoltar = new JButton("Voltar");
 
         //TODO: IMPLEMENTAR AS CLASSES EM VERMELHO
 
         btnCadastrarTurma.addActionListener(e -> {
             new TelaCadastroTurma(sistema).setVisible(true);
-            dispose();
+            this.setVisible(false);
         });
 
         btnConsultarTurma.addActionListener(e -> {
             new TelaConsultaTurma(sistema).setVisible(true);
-            dispose();
+            this.setVisible(false);
         });
 
         btnCadastrarAluno.addActionListener(e -> {
             new TelaCadastroAluno(sistema).setVisible(true);
-            dispose();
+            this.setVisible(false);
         });
 
         btnConsultarAluno.addActionListener(e -> {
             new TelaConsultaAluno(sistema).setVisible(true);
-            dispose();
+            this.setVisible(false);
         });
 
         btnListarAlunos.addActionListener(e -> {
             new TelaListarAlunos(sistema).setVisible(true);
-            dispose();
+            this.setVisible(false);
         });
 
         btnCadastrarNota.addActionListener(e -> {
             new TelaCadastroNota(sistema).setVisible(true);
-            dispose();
+            this.setVisible(false);
         });
 
-        btnCadastrarFaltas.addActionListener(e -> {
-            new TelaCadastroFaltas(sistema).setVisible(true);
-            dispose();
+        btnCadastrarPresenca.addActionListener(e -> {
+            new TelaCadastroPresenca(sistema).setVisible(true);
+            this.setVisible(false);
         });
-
-
 
         btnVoltar.addActionListener(e -> {
             new TelaInicial().setVisible(true);
@@ -71,7 +67,7 @@ public class AreaProfessor extends JFrame {
         panel.add(btnConsultarAluno);
         panel.add(btnListarAlunos);
         panel.add(btnCadastrarNota);
-        panel.add(btnCadastrarFaltas);
+        panel.add(btnCadastrarPresenca);
         panel.add(btnVoltar);
 
         add(panel);
