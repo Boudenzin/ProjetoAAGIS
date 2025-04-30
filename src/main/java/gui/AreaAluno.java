@@ -1,14 +1,12 @@
 package gui;
 
-import components.TurmaList;
 import components.TurmaSistema;
 
 import javax.swing.*;
 
 public class AreaAluno extends JFrame {
-    private TurmaSistema sistema = new TurmaList();
 
-    public AreaAluno() {
+    public AreaAluno(TurmaSistema sistema) {
        setSize(400, 300);
        setTitle("Área do Aluno");
        setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -21,22 +19,22 @@ public class AreaAluno extends JFrame {
 
        btnVerTurmas.addActionListener(e -> {
            new TelaVerTurmas(sistema).setVisible(true);
-           dispose();
+           this.setVisible(false);
        });
 
        btnConsultarNotas.addActionListener(e -> {
            new TelaConsultarNotas(sistema).setVisible(true);
-           dispose();
+           this.setVisible(false);
        });
 
        btnConsultarFaltas.addActionListener(e -> {
            new TelaConsultarFaltas(sistema).setVisible(true);
-           dispose();
+           this.setVisible(false);
        });
 
        btnVoltar.addActionListener(e -> {
-           new TelaInicial().setVisible(true);
-           dispose();
+           new TelaInicial(sistema).setVisible(true);
+           this.setVisible(false);
        });
 
        JPanel panel = new JPanel();
@@ -44,5 +42,7 @@ public class AreaAluno extends JFrame {
        panel.add(btnConsultarNotas);
        panel.add(btnConsultarFaltas);
        panel.add(btnVoltar);
+
+       add(panel);
     }
 }
