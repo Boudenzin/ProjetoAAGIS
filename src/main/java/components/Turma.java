@@ -38,7 +38,7 @@ public class Turma implements Serializable {
         if (!alunos.contains(aluno)) {
             alunos.add(aluno);
         } else {
-            throw new AlunoJaCadastradoException("components.Aluno " + aluno.getNome() + " já está na turma " + nome);
+            throw new AlunoJaCadastradoException("Aluno " + aluno.getNome() + " já está na turma " + nome);
         }
     }
 
@@ -52,7 +52,7 @@ public class Turma implements Serializable {
                 return aluno;
             }
         }
-        throw new AlunoNaoEncontradoException("components.Aluno " + nome + " não encontrado na turma " + this.nome);
+        throw new AlunoNaoEncontradoException("Aluno " + nome + " não encontrado na turma " + this.nome);
     }
 
     public List<Aluno> getAlunos() {
