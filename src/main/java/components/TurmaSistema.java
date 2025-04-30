@@ -15,6 +15,7 @@ public interface TurmaSistema {
 
     public void removerAlunoDaTurma(String matricula, String nomeTurma) throws AlunoNaoEncontradoException, TurmaNaoEncontradaException;
 
+    public List<Turma> listarTurmas();
     public Aluno buscarAlunoPorMatricula(String matricula, String nomeTurma) throws AlunoNaoEncontradoException, TurmaNaoEncontradaException;
 
     public List<Aluno> listarAlunosDaTurma(String nomeTurma) throws TurmaNaoEncontradaException;
