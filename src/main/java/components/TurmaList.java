@@ -84,6 +84,12 @@ public class TurmaList implements TurmaSistema {
     }
 
     @Override
+    public List<Turma> listarTurmas() {
+        return turmas;
+    }
+
+
+    @Override
     public List<Turma> recuperaTurma() throws IOException {
         try {
             this.turmas = gravador.recuperar(ARQUIVO_TURMAS);
