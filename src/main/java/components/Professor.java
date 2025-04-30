@@ -25,7 +25,7 @@ public class Professor {
 
     @Override
     public String toString() {
-        return "components.Professor: " + nome + " | Matrícula: " + matricula + " | Departamento: " + departamento;
+        return "Professor: " + nome + " | Matrícula: " + matricula + " | Departamento: " + departamento;
     }
 }
 
