@@ -56,7 +56,7 @@ public class AreaProfessor extends JFrame {
         });
 
         btnVoltar.addActionListener(e -> {
-            new TelaInicial().setVisible(true);
+            new TelaInicial(sistema).setVisible(true);
             dispose();
         });
 
