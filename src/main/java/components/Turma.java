@@ -46,9 +46,9 @@ public class Turma implements Serializable {
         alunos.remove(aluno);
     }
 
-    public Aluno getAluno(String nome) throws AlunoNaoEncontradoException{
+    public Aluno buscarAluno(String matricula) throws AlunoNaoEncontradoException{
         for (Aluno aluno : alunos) {
-            if (aluno.getNome().equals(nome)) {
+            if (aluno.getMatricula().equals(matricula)) {
                 return aluno;
             }
         }
