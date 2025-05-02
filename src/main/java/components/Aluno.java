@@ -10,7 +10,7 @@ public class Aluno implements Serializable {
     private String matricula;
     private String curso;
     private Map <String, Double> notas;
-    private Map <String, Integer> frequencias;
+    private Map <String, Integer> faltas;
 
 
     public Aluno(String nome, String matricula, String curso) {
@@ -18,7 +18,7 @@ public class Aluno implements Serializable {
         this.matricula = matricula;
         this.curso = curso;
         this.notas = new HashMap<>();
-        this.frequencias = new HashMap<>();
+        this.faltas = new HashMap<>();
     }
 
     @Override
@@ -62,15 +62,25 @@ public class Aluno implements Serializable {
         notas.put(disciplina, nota);
     }
 
-    public double getNota(String disciplina) {
+    public double getNotas(String disciplina) {
         return notas.getOrDefault(disciplina, 0.0);
     }
 
+    public Map<String, Integer> getTodasFaltas() {
+        return new HashMap<>(faltas);
+    }
+
+
+    public Map<String, Double> getTodasNotas() {
+        return new HashMap<>(notas); // retorna uma cópia para segurança
+    }
+
+
     public int getFrequencia(String disciplina) {
-        return frequencias.getOrDefault(disciplina, 0);
+        return faltas.getOrDefault(disciplina, 0);
     }
     public void registrarFrequencia(String disciplina, int frequencia) {
-        frequencias.put(disciplina, frequencias.getOrDefault(disciplina, 0) + 1);
+        faltas.put(disciplina, faltas.getOrDefault(disciplina, 0) + 1);
     }
 
     public String toString(){
