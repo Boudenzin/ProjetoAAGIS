@@ -9,8 +9,14 @@ import gui.*;
 
 public class TelaInicial extends JFrame {
 
-    private TurmaSistema sistema = new TurmaList();
+    private TurmaSistema sistema;
+
     public TelaInicial() {
+        this(new TurmaList());
+    }
+    public TelaInicial(TurmaSistema sistema) {
+        this.sistema = sistema;
+
         setTitle("Sistema Escolar");
         setSize(300, 200);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -37,6 +43,7 @@ public class TelaInicial extends JFrame {
     }
 
     public static void main(String[] args) {
+
         new TelaInicial().setVisible(true);
     }
 }
