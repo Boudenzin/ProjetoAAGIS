@@ -1,21 +1,27 @@
 package gui;
 
-import javax.swing.*;
-import java.awt.event.*;
+import dao.AlunoDAO;
+import dao.ProfessorDAO;
+import dao.TurmaDAO;
+import service.TurmaService;
+import service.UsuarioService;
 
-import components.TurmaList;
-import components.TurmaSistema;
-import gui.*;
+import javax.swing.*;
 
 public class TelaInicial extends JFrame {
 
-    private TurmaSistema sistema;
+    private UsuarioService usuarioService;
+    private TurmaService turmaService;
+    private AlunoDAO alunoDAO;
+    private ProfessorDAO professorDAO;
+    private TurmaDAO turmaDAO;
 
     public TelaInicial() {
-        this(new TurmaList());
-    }
-    public TelaInicial(TurmaSistema sistema) {
-        this.sistema = sistema;
+        this.alunoDAO = new AlunoDAO();
+        this.professorDAO = new ProfessorDAO();
+        this.turmaDAO = new TurmaDAO();
+        this.usuarioService = new UsuarioService(alunoDAO, professorDAO);
+        this.turmaService = new TurmaService(turmaDAO);
 
         setTitle("Sistema Escolar");
         setSize(300, 200);
@@ -26,12 +32,12 @@ public class TelaInicial extends JFrame {
         JButton btnAluno = new JButton("Área do Aluno");
 
         btnProfessor.addActionListener(e -> {
-            new AreaProfessor(sistema).setVisible(true);
+            new TelaLogin(usuarioService, turmaService, "professor").setVisible(true);
             dispose();
         });
 
         btnAluno.addActionListener(e -> {
-            new AreaAluno(sistema).setVisible(true);
+            new TelaLogin(usuarioService, turmaService, "aluno").setVisible(true);
             dispose();
         });
 
@@ -43,8 +49,6 @@ public class TelaInicial extends JFrame {
     }
 
     public static void main(String[] args) {
-
-        new TelaInicial().setVisible(true);
+        SwingUtilities.invokeLater(() -> new TelaInicial().setVisible(true));
     }
 }
-

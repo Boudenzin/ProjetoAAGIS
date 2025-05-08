@@ -1,72 +1,68 @@
 package gui;
 
-import components.Aluno;
-import components.Turma;
-import components.TurmaSistema;
+import model.Aluno;
+import model.AlunoTurma;
+import model.Turma;
+import service.TurmaService;
+import service.UsuarioService;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class TelaConsultarNotas extends JFrame {
-    private TurmaSistema sistema;
 
-    public TelaConsultarNotas(TurmaSistema sistema) {
-        this.sistema = sistema;
+    public TelaConsultarNotas(UsuarioService usuarioService, TurmaService turmaService, Aluno aluno) {
         setTitle("Consultar Notas");
-        setSize(400, 300);
+        setSize(500, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JLabel lblNomeTurma = new JLabel("Nome da Turma:");
-        JTextField txtNomeTurma = new JTextField(20);
-        JLabel lblMatricula = new JLabel("Matrícula do Aluno:");
-        JTextField txtMatricula = new JTextField(20);
-        JButton btnConsultar = new JButton("Consultar");
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+
+        try {
+            List<Turma> turmas = turmaService.getTurmasDoAluno(aluno);
+            if (turmas.isEmpty()) {
+                textArea.setText("Você não está matriculado em nenhuma turma.");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for (Turma turma : turmas) {
+                    sb.append("Turma: ").append(turma.getNome()).append(" (Professor: ")
+                            .append(turma.getProfessor().getNome()).append(")\n");
+
+                    for (AlunoTurma at : turma.getParticipantes()) {
+                        if (at.getAluno().equals(aluno)) {
+                            Map<Integer, Double> notas = at.getNotasPorUnidade();
+                            for (Map.Entry<Integer, Double> entry : notas.entrySet()) {
+                                sb.append(" - Unidade ").append(entry.getKey())
+                                        .append(": Nota ").append(entry.getValue()).append("\n");
+                            }
+                            break;
+                        }
+                    }
+                    sb.append("\n");
+                }
+                textArea.setText(sb.toString());
+            }
+        } catch (IOException e) {
+            textArea.setText("Erro ao carregar as notas: " + e.getMessage());
+        }
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+
         JButton btnVoltar = new JButton("Voltar");
-
-        btnConsultar.addActionListener(e -> {
-            String nomeTurma = txtNomeTurma.getText().trim();
-            String matricula = txtMatricula.getText().trim();
-
-            if (nomeTurma.isEmpty() || matricula.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Preencha todos os campos.");
-                return;
-            }
-
-            try {
-                Turma turma = sistema.buscarTurma(nomeTurma);
-                Aluno aluno = turma.buscarAluno(matricula);
-
-                Map<String, Double> notas = aluno.getTodasNotas();
-                if (notas.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Este aluno não possui notas cadastradas.");
-                    return;
-                }
-
-                StringBuilder sb = new StringBuilder("Notas do aluno:\n");
-                for (Map.Entry<String, Double> entry : notas.entrySet()) {
-                    sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
-                }
-
-                JOptionPane.showMessageDialog(this, sb.toString());
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erro: " + ex.getMessage());
-            }
-        });
-
         btnVoltar.addActionListener(e -> {
-            new AreaAluno(sistema).setVisible(true);
+            // Voltar para a TelaAluno
+            new TelaAluno(usuarioService, turmaService, aluno).setVisible(true);
             this.dispose();
         });
 
-        JPanel panel = new JPanel();
-        panel.add(lblNomeTurma);
-        panel.add(txtNomeTurma);
-        panel.add(lblMatricula);
-        panel.add(txtMatricula);
-        panel.add(btnConsultar);
-        panel.add(btnVoltar);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(btnVoltar, BorderLayout.SOUTH);
 
         add(panel);
     }

@@ -1,66 +1,58 @@
 package gui;
 
+import model.Professor;
+import model.Turma;
+import service.TurmaService;
+import service.UsuarioService;
+
 import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 
 public class TelaCadastroTurma extends JFrame {
 
-    public TelaCadastroTurma() {
-        initComponents();
-    }
+    public TelaCadastroTurma(UsuarioService usuarioService, TurmaService turmaService, Professor professor) {
+        setTitle("Cadastrar Nova Turma");
+        setSize(400, 250);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-    @SuppressWarnings("unchecked")
-    private void initComponents() {
+        JLabel lblNome = new JLabel("Nome da Turma:");
+        JTextField txtNome = new JTextField(20);
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        JButton btnCadastrar = new JButton("Cadastrar");
+        JButton btnVoltar = new JButton("Voltar");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        btnCadastrar.addActionListener(e -> {
+            String nome = txtNome.getText().trim();
 
-        jLabel1.setText("Cadastro de Turma");
+            if (nome.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        jLabel2.setText("Código:");
-
-        jLabel3.setText("Nome:");
-
-        jLabel4.setText("Período:");
-
-        jLabel5.setText("Professor:");
-
-        jButton1.setText("Cadastrar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                // Implementar ação do botão
+            try {
+                turmaService.criarTurma(nome, professor);
+                JOptionPane.showMessageDialog(this, "Turma cadastrada com sucesso!");
+                new TelaProfessor(usuarioService, turmaService, professor).setVisible(true);
+                dispose();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar a turma: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Layout configuration omitted for brevity
-
-    }
-
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TelaCadastroTurma().setVisible(true);
-            }
+        btnVoltar.addActionListener(e -> {
+            new TelaProfessor(usuarioService, turmaService, professor).setVisible(true);
+            dispose();
         });
-    }
 
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+        JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.add(lblNome);
+        panel.add(txtNome);
+        panel.add(btnCadastrar);
+        panel.add(btnVoltar);
+
+        add(panel);
+    }
 }

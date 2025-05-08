@@ -1,4 +1,4 @@
-package components;
+package exceptions;
 
 public class TurmaNaoEncontradaException extends Exception{
 
