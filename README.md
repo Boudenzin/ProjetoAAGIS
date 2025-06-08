@@ -25,23 +25,25 @@ O projeto oferece as seguintes funcionalidades:
 
 ```bash
 ProjetoAAGIS/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   ├── components.AagisProgram.java          # Classe principal do sistema.
-│   │   │   ├── components.Aluno.java                 # Classe que representa um aluno.
-│   │   │   ├── components.Turma.java                 # Classe que representa uma turma.
-│   │   │   ├── components.SistemaAcademico.java             # Classe que gerencia a lista de turmas e operações.
-│   │   │   ├── components.GravadorDeDados.java       # Classe responsável por gravar e recuperar dados em arquivos.
-│   │   │   ├── components.SisAcademicoInterface.java          # Interface que define as operações do sistema.
-│   │   │   ├── Exceções/                  # Exceções personalizadas para tratamento de erros.
-│   │   │   │   ├── components.AlunoJaCadastradoException.java
-│   │   │   │   ├── components.AlunoNaoEncontradoException.java
-│   │   │   │   ├── components.TurmaJaCriadaException.java
-│   │   │   │   ├── components.TurmaNaoEncontradaException.java
-├── data/                                  # Diretório para armazenar os arquivos de dados.
-│   ├── turmas.txt                         # Arquivo de persistência das turmas.
-│   ├── alunos.txt                         # Arquivo de persistência dos alunos.
+├───src
+│   └───main
+│       └───java
+│           ├───dao
+│           ├───exceptions
+│           ├───gui
+│           ├───model
+│           ├───service
+│           └───util
+└───target
+    ├───classes
+    │   ├───dao
+    │   ├───exceptions
+    │   ├───gui
+    │   ├───model
+    │   ├───service
+    │   └───util
+    └───generated-sources
+        └───annotations
 ├── README.md                              # Este arquivo.
 
 ```
