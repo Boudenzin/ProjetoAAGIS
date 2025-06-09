@@ -77,6 +77,11 @@ ProjetoAAGIS/
 
 E por final, o sistema exibirá um menu interativo para realizar as operações.
 
+## Problemas a Resolver
+
+1. Implementar o salvamento de dados a todas as partes.
+   - Está faltando implementar nas turmas dos professores e melhorar o layout das telas
+
 ## Próximos Objetivos
 
 Aqui listamos futuras metas que queremos implementar nesse projeto
