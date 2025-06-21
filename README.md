@@ -21,7 +21,7 @@ O projeto oferece as seguintes funcionalidades:
 - **Persistência de Dados**: Armazenamento em arquivos de texto (`turmas.txt` e `alunos.txt`).
 - **Tratamento de Exceções**: Uso de exceções personalizadas para tratamento de erros específicos.
 
-##Estrutura do Projeto
+## Estrutura do Projeto
 
 ```bash
 ProjetoAAGIS/
@@ -56,8 +56,9 @@ ProjetoAAGIS/
 ### Passos para Execução
 
 1. Clone o repositório:
-   ```bash
-   git clone https://github.com/Boudenzin/ProjetoAAGIS.git
+  ```bash
+    git clone https://github.com/Boudenzin/ProjetoAAGIS.git
+  ```
 2. **Navegue até o diretório do projeto**:
   ```bash
     cd ProjetoAAGIS
@@ -69,9 +70,9 @@ ProjetoAAGIS/
   ```
 
 4. **Execute o programa**:
-   ```bash
-   java -cp out components.AagisProgram
-   ```
+  ```bash
+    java -cp out components.AagisProgram
+  ```
    
 
 
