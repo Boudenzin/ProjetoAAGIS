@@ -10,24 +10,30 @@ import javax.swing.*;
 
 public class TelaInicial extends JFrame {
 
-    private UsuarioService usuarioService;
-    private TurmaService turmaService;
-    private AlunoDAO alunoDAO;
-    private ProfessorDAO professorDAO;
-    private TurmaDAO turmaDAO;
+    private final UsuarioService usuarioService;
+    private final TurmaService turmaService;
 
     public TelaInicial() {
-        this.alunoDAO = new AlunoDAO();
-        this.professorDAO = new ProfessorDAO();
-        this.turmaDAO = new TurmaDAO();
+        AlunoDAO alunoDAO = new AlunoDAO();
+        ProfessorDAO professorDAO = new ProfessorDAO();
+        TurmaDAO turmaDAO = new TurmaDAO();
         this.usuarioService = new UsuarioService(alunoDAO, professorDAO);
         this.turmaService = new TurmaService(turmaDAO);
+
+        //CASO ESQUEÇA: USUARIO: bouden, senha: 1234567890
+        //CASO ESQUEÇA: USUARIO: vanessa.dcx, senha: 12345
 
         setTitle("Sistema Escolar");
         setSize(300, 200);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        JPanel panel = getjPanel();
+
+        add(panel);
+    }
+
+    private JPanel getjPanel() {
         JButton btnProfessor = new JButton("Área do Professor");
         JButton btnAluno = new JButton("Área do Aluno");
 
@@ -44,8 +50,7 @@ public class TelaInicial extends JFrame {
         JPanel panel = new JPanel();
         panel.add(btnProfessor);
         panel.add(btnAluno);
-
-        add(panel);
+        return panel;
     }
 
     public static void main(String[] args) {
