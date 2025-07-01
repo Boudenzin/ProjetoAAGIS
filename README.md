@@ -1,99 +1,100 @@
 # ProjetoAAGIS
 
 [![Licença: MIT](https://img.shields.io/badge/Licen%C3%A7a-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Java Version](https://img.shields.io/badge/Java-22%2B-red?logo=openjdk&logoColor=white)](https://www.java.com/)
+[![Java Version](https://img.shields.io/badge/Java-22%2B-red?logo=openjdk\&logoColor=white)](https://www.java.com/)
 
-O **ProjetoAAGIS** é um sistema de gerenciamento de turmas e alunos desenvolvido em Java, inspirado no SIGAA. Ele permite o cadastro de turmas, alunos, e a realização de operações como remoção, pesquisa e listagem de alunos por turma. O sistema também inclui persistência de dados, armazenando as informações em arquivos para recuperação futura.
+O **ProjetoAAGIS** é um sistema de gerenciamento de turmas e alunos desenvolvido em **Java**, inspirado no SIGAA. Ele oferece uma interface gráfica construída com `javax.swing`, permitindo uma experiência mais interativa para professores e alunos. O sistema conta com autenticação, persistência de dados via arquivos e uma série de funcionalidades para o gerenciamento acadêmico.
 
 ## Funcionalidades
 
-O projeto oferece as seguintes funcionalidades:
+O sistema é dividido em duas áreas principais: **Área do Professor** e **Área do Aluno**, além da **tela de autenticação e cadastro** para ambos os perfis.
 
-1. **Cadastrar Turma**: Cria uma nova turma com um nome e um docente responsável.
-2. **Cadastrar Aluno na Turma**: Adiciona um aluno a uma turma específica, com nome, matrícula e curso.
-3. **Ver Todos os Alunos da Turma**: Lista todos os alunos cadastrados em uma turma.
-4. **Remover Aluno da Turma**: Remove um aluno de uma turma com base na matrícula.
-5. **Remover Turma**: Remove uma turma e todos os alunos associados a ela.
+### Área do Aluno
 
+* Consultar turmas cadastradas
+* Ver notas por disciplina
+* Ver faltas por disciplina
+
+### Área do Professor
+
+* Cadastrar novas turmas
+* Consultar turmas existentes
+* Cadastrar alunos em uma turma
+* Listar alunos da turma
+* Adicionar notas para alunos
+* Adicionar faltas para alunos
+
+### Funcionalidades Gerais
+
+* Cadastro e autenticação de alunos e professores
+* Armazenamento persistente das informações (em arquivos)
+* Interface gráfica com `javax.swing` (`JFrame`, `JPanel`, `JButton`, etc.)
 
 ## Tecnologias Utilizadas
 
-- **Linguagem**: Java
-- **Interface Gráfica**: `JOptionPane` para interação com o usuário.
-- **Persistência de Dados**: Armazenamento em arquivos de texto (`turmas.dat`, `alunos.dat`, `´professores.dat`).
-- **Tratamento de Exceções**: Uso de exceções personalizadas para tratamento de erros específicos.
+* **Linguagem**: Java
+* **Interface Gráfica**: `javax.swing`
+* **Persistência de Dados**: Arquivos (`.dat`)
+* **Tratamento de Exceções**: Uso de exceções personalizadas
 
 ## Estrutura do Projeto
 
-```bash
+```
 ProjetoAAGIS/
 ├───src
 │   └───main
 │       └───java
-│           ├───dao
-│           ├───exceptions
-│           ├───gui
-│           ├───model
-│           ├───service
-│           └───util
-├── README.md                              # Este arquivo.
-
+│           ├───dao            # Lógica de acesso a dados
+│           ├───exceptions     # Exceções personalizadas
+│           ├───gui            # Telas e menus da interface gráfica
+│           ├───model          # Entidades: Turma, Aluno, Professor etc.
+│           ├───service        # Regras de negócio
+│           └───util           # Utilitários diversos
+├───README.md
 ```
+
 ## Como Executar o Projeto
 
 ### Pré-requisitos
-- Java Development Kit (JDK) instalado.
-- Um ambiente de desenvolvimento Java (IDE como IntelliJ, Eclipse, ou VS Code) ou terminal.
 
----
-### Passos para Execução
+* JDK 22 ou superior
+* IDE Java (IntelliJ, Eclipse, VS Code) ou terminal com Java configurado
+
+### Passos
 
 1. Clone o repositório:
-  ```bash
-    git clone https://github.com/Boudenzin/ProjetoAAGIS.git
-  ```
-2. **Navegue até o diretório do projeto**:
-  ```bash
-    cd ProjetoAAGIS
-  ```
 
-3. **Compile o projeto**:
-  ```bash
-    javac src/main/java/gui/TelaInicial.java
-  ```
+```bash
+git clone https://github.com/Boudenzin/ProjetoAAGIS.git
+```
 
-4. **Execute o programa**:
-  ```bash
-    java src/main/java/gui/TelaInicial.java
-  ```
-   
-E por final, o sistema exibirá um menu interativo para realizar as operações.
+2. Acesse o diretório do projeto:
 
----
+```bash
+cd ProjetoAAGIS
+```
+
+3. Compile a classe principal:
+
+```bash
+javac src/main/java/gui/TelaInicial.java
+```
+
+4. Execute o programa:
+
+```bash
+java -cp src/main/java gui.TelaInicial
+```
+
 
 ## Próximos Objetivos
 
-Aqui listamos futuras metas que queremos implementar nesse projeto:
-
-
-
-1. **Validação de Entradas**:
-   - Adicionar validações mais robustas para entradas de dados, como matrículas únicas e formatos específicos.
-
-2. **Banco de Dados**:
-   - Substituir a persistência em arquivos por um banco de dados (SQLite, MySQL, etc.) para melhor escalabilidade e desempenho.
-
-3. **Relatórios**:
-   - Implementar a geração de relatórios em PDF ou Excel com informações das turmas e alunos.
-
-4. **Testes Automatizados**:
-   - Implementar testes unitários com JUnit para garantir a qualidade do código.
-
-5. **Documentação de Código**:
-   - Adicionar comentários Javadoc para documentar o código de forma profissional.
-
-6. **Deploy**:
-   - Publicar o sistema em um servidor ou plataforma na nuvem para acesso remoto.
+* [ ] Validação de entradas (ex: impedir matrícula duplicada)
+* [ ] Integração com banco de dados (ex: SQLite ou MySQL)
+* [ ] Geração de relatórios (PDF ou Excel)
+* [ ] Implementação de testes automatizados com JUnit
+* [ ] Adição de documentação Javadoc
+* [ ] Disponibilizar o sistema online via deploy em nuvem
 
 ## Licença
 
