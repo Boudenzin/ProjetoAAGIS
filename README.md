@@ -90,6 +90,7 @@ java -cp src/main/java gui.TelaInicial
 ## Próximos Objetivos
 
 * [ ] Validação de entradas (ex: impedir matrícula duplicada)
+* [ ] Adicionar remoção de turmas por parte do professor
 * [ ] Integração com banco de dados (ex: SQLite ou MySQL)
 * [ ] Geração de relatórios (PDF ou Excel)
 * [ ] Implementação de testes automatizados com JUnit
