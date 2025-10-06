@@ -58,6 +58,10 @@ public class TelaCadastro extends JFrame {
             String senha = new String(senhaField.getPassword());
             String extra = extraField.getText();
 
+            if (nome.isBlank() || matricula.isBlank() || usuario.isBlank() || senha.isBlank() || extra.isBlank()) {
+                JOptionPane.showMessageDialog(this, "Por favor, preencha todos os campos!", "Erro de Cadastro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             try {
                 if (tipoUsuario.equalsIgnoreCase("aluno")) {
                     Aluno aluno = new Aluno(nome, matricula, extra, usuario, senha);
