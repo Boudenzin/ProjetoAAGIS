@@ -18,6 +18,11 @@ public class UsuarioService {
 
     // Cadastro de aluno
     public void cadastrarAluno(Aluno aluno) throws Exception {
+
+        if (aluno == null) {
+            throw new IllegalArgumentException("O objeto do aluno não pode ser nulo.");
+        }
+
         if (alunoDAO.buscarPorUsuario(aluno.getUsuario()) != null) {
             throw new UsuarioJaCadastradoException("Usuário já existente.");
         }
@@ -28,6 +33,11 @@ public class UsuarioService {
 
     // Cadastro de professor
     public void cadastrarProfessor(Professor professor) throws Exception {
+
+        if (professor == null) {
+            throw new IllegalArgumentException("O objeto do professor não pode ser nulo.");
+        }
+
         if (professorDAO.buscarPorUsuario(professor.getUsuario()) != null) {
             throw new UsuarioJaCadastradoException("Usuário já existente.");
         }

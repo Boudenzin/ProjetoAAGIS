@@ -109,6 +109,18 @@ class UsuarioServiceTest {
             //Assert
             assertNull(resultado, "A autenticação deveria falhar com usuário inexistente.");
         }
+
+        @Test
+        void deveLancarExcecaoAoTentarCadastrarProfessorNulo() {
+
+            // Act & Assert: Verificamos se a exceção correta (IllegalArgumentException) é lançada
+            assertThrows(IllegalArgumentException.class, () -> {
+                usuarioService.cadastrarProfessor(null);
+            });
+
+            // Garantir que nenhuma interação com o DAO ocorreu
+            verifyNoInteractions(professorDAO);
+        }
     }
 
     @Nested
@@ -177,6 +189,18 @@ class UsuarioServiceTest {
 
             //Assert
             assertNull(resultado, "A autenticação deveria falhar com senha incorreta, retornando null.");
+        }
+
+        @Test
+        void deveLancarExcecaoAoTentarCadastrarAlunoNulo() {
+
+            // Act & Assert: Verificamos se a exceção correta (IllegalArgumentException) é lançada
+            assertThrows(IllegalArgumentException.class, () -> {
+                usuarioService.cadastrarAluno(null);
+            });
+
+            // Garantir que nenhuma interação com o DAO ocorreu
+            verifyNoInteractions(alunoDAO);
         }
 
     }
