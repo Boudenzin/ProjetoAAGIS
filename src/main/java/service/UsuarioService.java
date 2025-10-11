@@ -48,6 +48,11 @@ public class UsuarioService {
 
     // Login de aluno
     public Aluno autenticarAluno(String usuario, String senhaDigitada) {
+
+        if (usuario == null || senhaDigitada == null) {
+            return null;
+        }
+
         Aluno aluno = alunoDAO.buscarPorUsuario(usuario);
         if (aluno != null && aluno.getSenha().equals(HashUtil.hashSenha(senhaDigitada))) {
             return aluno;
@@ -57,6 +62,11 @@ public class UsuarioService {
 
     // Login de professor
     public Professor autenticarProfessor(String usuario, String senhaDigitada) {
+
+        if (usuario == null || senhaDigitada == null) {
+            return null;
+        }
+
         Professor professor = professorDAO.buscarPorUsuario(usuario);
         if (professor != null && professor.getSenha().equals(HashUtil.hashSenha(senhaDigitada))) {
             return professor;

@@ -4,6 +4,8 @@ import dao.ProfessorDAO;
 import model.Aluno;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import exceptions.UsuarioJaCadastradoException;
 import org.junit.jupiter.api.Test;
 import util.HashUtil;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -99,18 +103,6 @@ class UsuarioServiceTest {
         }
 
         @Test
-        void naoDeveAutenticarProfessorComUsuarioInexistente() {
-            //Arrange
-            when(professorDAO.buscarPorUsuario("usuario_inexistente")).thenReturn(null);
-
-            //Act
-            Professor resultado = usuarioService.autenticarProfessor("usuario_inexistente", "qualquer_senha");
-
-            //Assert
-            assertNull(resultado, "A autenticação deveria falhar com usuário inexistente.");
-        }
-
-        @Test
         void deveLancarExcecaoAoTentarCadastrarProfessorNulo() {
 
             // Act & Assert: Verificamos se a exceção correta (IllegalArgumentException) é lançada
@@ -121,6 +113,45 @@ class UsuarioServiceTest {
             // Garantir que nenhuma interação com o DAO ocorreu
             verifyNoInteractions(professorDAO);
         }
+
+        @Test
+        void deveGarantirQueASenhaSalvaEhDiferenteDaSenhaPlana() throws Exception {
+
+            //Arrange
+            when(professorDAO.buscarPorUsuario(anyString())).thenReturn(null);
+            ArgumentCaptor<Professor> professorCaptor = ArgumentCaptor.forClass(Professor.class);
+
+            //Act
+            usuarioService.cadastrarProfessor(professorValido);
+
+            //Assert
+            verify(professorDAO).salvar(professorCaptor.capture()); // Captura o professor
+
+            Professor professorSalvo = professorCaptor.getValue();
+            assertNotEquals("senha123", professorSalvo.getSenha()); // Garante que a senha não é a original
+            assertNotNull(professorSalvo.getSenha());
+
+
+        }
+
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                "einstein,       NULL",      // Usuário válido, senha nula
+                "NULL,           senha123",  // Usuário nulo, senha válida
+                "einstein,       ''",        // Usuário válido, senha vazia
+                "'',             senha123",  // Usuário vazio, senha válida
+                "NULL,           NULL",      // Usuário nulo E senha nula
+                "'',             ''"        // Usuário vazio E senha vazia
+        }, nullValues = {"NULL"})
+        void deveRetornarNullParaCredenciaisInvalidasOuVaziasProfessor(String usuario, String senha) {
+            // Act
+            Professor resultado = usuarioService.autenticarProfessor(usuario, senha);
+
+            // Assert
+            assertNull(resultado, "Autenticação do professor deveria falhar para a combinação de entrada: [" + usuario + ", " + senha + "]");
+        }
+
     }
 
     @Nested
@@ -202,6 +233,63 @@ class UsuarioServiceTest {
             // Garantir que nenhuma interação com o DAO ocorreu
             verifyNoInteractions(alunoDAO);
         }
+
+        @Test
+        void deveGarantirQueASenhaSalvaEhDiferenteDaSenhaPlana() throws Exception {
+
+            //Arrange
+            when(alunoDAO.buscarPorUsuario(anyString())).thenReturn(null);
+            ArgumentCaptor<Aluno> alunoCaptor = ArgumentCaptor.forClass(Aluno.class);
+
+            //Act
+            usuarioService.cadastrarAluno(alunoValido);
+
+            //Assert
+            verify(alunoDAO).salvar(alunoCaptor.capture());
+
+            Aluno alunoSalvo = alunoCaptor.getValue();
+            assertNotEquals("senha123", alunoSalvo.getSenha());
+            assertNotNull(alunoSalvo.getSenha());
+
+
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                "newton,         NULL",      // Usuário válido, senha nula
+                "NULL,           senha123",  // Usuário nulo, senha válida
+                "newton,         ''",        // Usuário válido, senha vazia
+                "'',             senha123",  // Usuário vazio, senha válida
+                "NULL,           NULL",      // Usuário nulo E senha nula
+                "'',             ''"        // Usuário vazio E senha vazia
+
+        }, nullValues =  {"NULL"})
+        void deveRetornarNullParaCredenciaisInvalidasOuVazias(String usuario, String senha) {
+            // Act
+            Aluno resultado = usuarioService.autenticarAluno(usuario, senha);
+
+            // Assert
+            assertNull(resultado, "Autenticação deveria falhar para a combinação de entrada: [" + usuario + ", " + senha + "]");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"newton", "Newton", "NEWTON", "nEwToN"}) // Várias combinações de case
+        void deveAutenticarAlunoIgnorandoCaseDoUsuario(String usuarioDigitado) {
+            // Arrange
+            // O aluno no "banco de dados" está salvo com o usuário todo em minúsculas.
+            alunoValido.setSenha(senhaHash);
+            when(alunoDAO.buscarPorUsuario(argThat(arg -> arg.equalsIgnoreCase("newton"))))
+                    .thenReturn(alunoValido);
+            // Act
+            // Tentamos autenticar com as diferentes combinações de case
+            Aluno resultado = usuarioService.autenticarAluno(usuarioDigitado, senhaPlana);
+
+            // Assert
+            // O resultado NUNCA deve ser nulo, o login deve funcionar para todos os casos.
+            assertNotNull(resultado, "A autenticação deveria funcionar independentemente do case para o usuário: " + usuarioDigitado);
+            assertEquals("Isaac Newton", resultado.getNome());
+        }
+
 
     }
 

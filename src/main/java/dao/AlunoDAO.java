@@ -26,14 +26,23 @@ public class AlunoDAO {
     }
 
     public Aluno buscarPorUsuario(String usuario) {
+
+        if (usuario == null) {
+            return null;
+        }
+
         return alunos.stream()
-                .filter(a -> a.getUsuario().equals(usuario))
+                .filter(a -> a.getUsuario().equalsIgnoreCase(usuario))
                 .findFirst()
                 .orElse(null);
     }
     public Aluno buscarPorMatricula(String matricula) {
+
+        if (matricula == null) {
+            return null;
+        }
         return alunos.stream()
-                .filter(a -> a.getMatricula().equals(matricula))
+                .filter(a -> a.getMatricula().equalsIgnoreCase(matricula))
                 .findFirst()
                 .orElse(null);
     }

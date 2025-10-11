@@ -26,8 +26,13 @@ public class ProfessorDAO {
     }
 
     public Professor buscarPorUsuario(String usuario) {
+
+        if (usuario == null) {
+            return null;
+        }
+
         return professores.stream()
-                .filter(p -> p.getUsuario().equals(usuario))
+                .filter(p -> p.getUsuario().equalsIgnoreCase(usuario))
                 .findFirst()
                 .orElse(null);
     }
