@@ -36,21 +36,24 @@ class UsuarioServiceTest {
 
     @Nested
     class TestesDeProfessor {
+
+        private static final String USUARIO_EINSTEIN = "einstein";
+        private static final String SENHA_PLANA = "senha123";
+        private static final String NOME_EINSTEIN = "Albert Einstein";
         private Professor professorValido;
-        private String senhaPlana = "senha123";
         private String senhaHash;
 
         @BeforeEach
         void setUp() {
-            professorValido = new Professor("Albert Einstein", "1905", "Física", "einstein", senhaPlana);
-            senhaHash = HashUtil.hashSenha(senhaPlana);
+            professorValido = new Professor(NOME_EINSTEIN, "1905", "Física", USUARIO_EINSTEIN, SENHA_PLANA);
+            senhaHash = HashUtil.hashSenha(SENHA_PLANA);
         }
 
         @Test
         void deveCadastrarProfessorComSucesso() throws Exception {
             //Arrange
 
-            when(professorDAO.buscarPorUsuario("einstein")).thenReturn(null);
+            when(professorDAO.buscarPorUsuario(USUARIO_EINSTEIN)).thenReturn(null);
 
             //Act
             usuarioService.cadastrarProfessor(professorValido);
@@ -64,7 +67,7 @@ class UsuarioServiceTest {
         void deveLancarExcecaoAoTentarCadastrarProfessorComUsuarioExistente() throws Exception {
             //Arrange
 
-            when(professorDAO.buscarPorUsuario("einstein")).thenReturn(professorValido);
+            when(professorDAO.buscarPorUsuario(USUARIO_EINSTEIN)).thenReturn(professorValido);
 
             // Act e Assert
             assertThrows(UsuarioJaCadastradoException.class, () -> {
@@ -79,14 +82,14 @@ class UsuarioServiceTest {
             //Arrange
 
             professorValido.setSenha(senhaHash);
-            when(professorDAO.buscarPorUsuario("einstein")).thenReturn(professorValido);
+            when(professorDAO.buscarPorUsuario(USUARIO_EINSTEIN)).thenReturn(professorValido);
 
             //Act
-            Professor resultado = usuarioService.autenticarProfessor("einstein", senhaPlana);
+            Professor resultado = usuarioService.autenticarProfessor(USUARIO_EINSTEIN, SENHA_PLANA);
 
             //Assert
             assertNotNull(resultado);
-            assertEquals("Albert Einstein", resultado.getNome());
+            assertEquals(NOME_EINSTEIN, resultado.getNome());
 
         }
 
@@ -94,10 +97,10 @@ class UsuarioServiceTest {
         void naoDeveAutenticarProfessorComSenhaIncorreta() {
             //Arrange
             professorValido.setSenha(senhaHash);
-            when(professorDAO.buscarPorUsuario("einstein")).thenReturn(professorValido);
+            when(professorDAO.buscarPorUsuario(USUARIO_EINSTEIN)).thenReturn(professorValido);
 
             //Act
-            Professor resultado = usuarioService.autenticarProfessor("einstein", "senha_errada_123");
+            Professor resultado = usuarioService.autenticarProfessor(USUARIO_EINSTEIN, "senha_errada_123");
 
             //Assert
             assertNull(resultado, "A autenticação deveria falhar com senha incorreta, retornando null.");
@@ -159,16 +162,16 @@ class UsuarioServiceTest {
             // Arrange
             // O professor no "banco de dados" está salvo com o usuário todo em minúsculas.
             professorValido.setSenha(senhaHash);
-            when(professorDAO.buscarPorUsuario(argThat(arg -> arg.equalsIgnoreCase("einstein"))))
+            when(professorDAO.buscarPorUsuario(argThat(arg -> arg.equalsIgnoreCase(USUARIO_EINSTEIN))))
                     .thenReturn(professorValido);
             // Act
             // Tentamos autenticar com as diferentes combinações de case
-            Professor resultado = usuarioService.autenticarProfessor(usuarioDigitado, senhaPlana);
+            Professor resultado = usuarioService.autenticarProfessor(usuarioDigitado, SENHA_PLANA);
 
             // Assert
             // O resultado NUNCA deve ser nulo, o login deve funcionar para todos os casos.
             assertNotNull(resultado, "A autenticação deveria funcionar independentemente do case para o usuário: " + usuarioDigitado);
-            assertEquals("Albert Einstein", resultado.getNome());
+            assertEquals(NOME_EINSTEIN, resultado.getNome());
         }
 
 
@@ -176,21 +179,24 @@ class UsuarioServiceTest {
 
     @Nested
     class TestesDeAluno {
+        private static final String USUARIO_NEWTON = "newton";
+        private static final String SENHA_PLANA = "senha123";
+        private static final String NOME_NEWTON = "Isaac Newton";
+
         private Aluno alunoValido;
-        private String senhaPlana = "senha123";
         private String senhaHash;
 
         @BeforeEach
         void setUp() {
-            alunoValido = new Aluno("Isaac Newton", "1687", "Matemática", "newton", senhaPlana);
-            senhaHash = HashUtil.hashSenha(senhaPlana);
+            alunoValido = new Aluno(NOME_NEWTON, "1687", "Matemática", USUARIO_NEWTON, SENHA_PLANA);
+            senhaHash = HashUtil.hashSenha(SENHA_PLANA);
         }
 
         @Test
         void deveCadastrarAlunoComSucesso() throws Exception {
             //Arrange
 
-            when(alunoDAO.buscarPorUsuario("newton")).thenReturn(null);
+            when(alunoDAO.buscarPorUsuario(USUARIO_NEWTON)).thenReturn(null);
 
             //Act
 
@@ -204,7 +210,7 @@ class UsuarioServiceTest {
         void deveLancarExcecaoAoTentarCadastrarAlunoComUsuarioExistente() throws Exception {
 
             //Arrange
-            when(alunoDAO.buscarPorUsuario("newton")).thenReturn(alunoValido);
+            when(alunoDAO.buscarPorUsuario(USUARIO_NEWTON)).thenReturn(alunoValido);
 
             // Act e Assert
             assertThrows(UsuarioJaCadastradoException.class, () -> {
@@ -218,14 +224,14 @@ class UsuarioServiceTest {
 
             //Arrange
             alunoValido.setSenha(senhaHash);
-            when(alunoDAO.buscarPorUsuario("newton")).thenReturn(alunoValido);
+            when(alunoDAO.buscarPorUsuario(USUARIO_NEWTON)).thenReturn(alunoValido);
 
             //Act
-            Aluno resultado = usuarioService.autenticarAluno("newton", senhaPlana);
+            Aluno resultado = usuarioService.autenticarAluno(USUARIO_NEWTON, SENHA_PLANA);
 
             //Assert
             assertNotNull(resultado);
-            assertEquals("Isaac Newton", resultado.getNome());
+            assertEquals(NOME_NEWTON, resultado.getNome());
         }
 
         @Test
@@ -233,10 +239,10 @@ class UsuarioServiceTest {
 
             //Arrange
             alunoValido.setSenha(senhaHash);
-            when(alunoDAO.buscarPorUsuario("newton")).thenReturn(alunoValido);
+            when(alunoDAO.buscarPorUsuario(USUARIO_NEWTON)).thenReturn(alunoValido);
 
             //Act
-            Aluno resultado = usuarioService.autenticarAluno("newton", "senha_errada_123");
+            Aluno resultado = usuarioService.autenticarAluno(USUARIO_NEWTON, "senha_errada_123");
 
             //Assert
             assertNull(resultado, "A autenticação deveria falhar com senha incorreta, retornando null.");
@@ -298,16 +304,16 @@ class UsuarioServiceTest {
             // Arrange
             // O aluno no "banco de dados" está salvo com o usuário todo em minúsculas.
             alunoValido.setSenha(senhaHash);
-            when(alunoDAO.buscarPorUsuario(argThat(arg -> arg.equalsIgnoreCase("newton"))))
+            when(alunoDAO.buscarPorUsuario(argThat(arg -> arg.equalsIgnoreCase(USUARIO_NEWTON))))
                     .thenReturn(alunoValido);
             // Act
             // Tentamos autenticar com as diferentes combinações de case
-            Aluno resultado = usuarioService.autenticarAluno(usuarioDigitado, senhaPlana);
+            Aluno resultado = usuarioService.autenticarAluno(usuarioDigitado, SENHA_PLANA);
 
             // Assert
             // O resultado NUNCA deve ser nulo, o login deve funcionar para todos os casos.
             assertNotNull(resultado, "A autenticação deveria funcionar independentemente do case para o usuário: " + usuarioDigitado);
-            assertEquals("Isaac Newton", resultado.getNome());
+            assertEquals(NOME_NEWTON, resultado.getNome());
         }
 
         @Test
@@ -322,7 +328,7 @@ class UsuarioServiceTest {
             //Assert
             assertNotNull(resultado);
             assertEquals(matriculaExistente, resultado.getMatricula());
-            assertEquals("Isaac Newton", resultado.getNome());
+            assertEquals(NOME_NEWTON, resultado.getNome());
         }
 
         @Test
