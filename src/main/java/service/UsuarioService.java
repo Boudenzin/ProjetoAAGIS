@@ -75,6 +75,11 @@ public class UsuarioService {
     }
 
     public Aluno buscarAlunoPorMatricula(String matricula) {
+
+        if (matricula == null || matricula.isBlank()) {
+            return null;
+        }
+
         return alunoDAO.buscarPorMatricula(matricula);
     }
 

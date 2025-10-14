@@ -4,6 +4,7 @@ import dao.ProfessorDAO;
 import model.Aluno;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -152,6 +153,25 @@ class UsuarioServiceTest {
             assertNull(resultado, "Autenticação do professor deveria falhar para a combinação de entrada: [" + usuario + ", " + senha + "]");
         }
 
+        @ParameterizedTest
+        @ValueSource(strings = {"einstein", "Einstein", "EINSTEIN", "eInStEiN"}) // Várias combinações de case
+        void deveAutenticarProfessorIgnorandoCaseDoUsuario(String usuarioDigitado) {
+            // Arrange
+            // O professor no "banco de dados" está salvo com o usuário todo em minúsculas.
+            professorValido.setSenha(senhaHash);
+            when(professorDAO.buscarPorUsuario(argThat(arg -> arg.equalsIgnoreCase("einstein"))))
+                    .thenReturn(professorValido);
+            // Act
+            // Tentamos autenticar com as diferentes combinações de case
+            Professor resultado = usuarioService.autenticarProfessor(usuarioDigitado, senhaPlana);
+
+            // Assert
+            // O resultado NUNCA deve ser nulo, o login deve funcionar para todos os casos.
+            assertNotNull(resultado, "A autenticação deveria funcionar independentemente do case para o usuário: " + usuarioDigitado);
+            assertEquals("Albert Einstein", resultado.getNome());
+        }
+
+
     }
 
     @Nested
@@ -289,6 +309,49 @@ class UsuarioServiceTest {
             assertNotNull(resultado, "A autenticação deveria funcionar independentemente do case para o usuário: " + usuarioDigitado);
             assertEquals("Isaac Newton", resultado.getNome());
         }
+
+        @Test
+        void deveRetornarAlunoQuandoMatriculaExistir() {
+            //Arrange
+            String matriculaExistente = "1687";
+            when(alunoDAO.buscarPorMatricula(matriculaExistente)).thenReturn(alunoValido);
+
+            //Act
+            Aluno resultado = usuarioService.buscarAlunoPorMatricula(matriculaExistente);
+
+            //Assert
+            assertNotNull(resultado);
+            assertEquals(matriculaExistente, resultado.getMatricula());
+            assertEquals("Isaac Newton", resultado.getNome());
+        }
+
+        @Test
+        void deveRetornarNullQuandoMatriculaNaoExistir() {
+            // Arrange
+            String matriculaInexistente = "matricula_que_nao_existe";
+            when(alunoDAO.buscarPorMatricula(matriculaInexistente)).thenReturn(null);
+
+            //Act
+            Aluno resultado = usuarioService.buscarAlunoPorMatricula(matriculaInexistente);
+
+            //Assert
+            assertNull(resultado);
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource // Fornece um valor nulo e uma string vazia ("") para o teste
+        @ValueSource(strings = {"  ", "\t", "\n"}) // Fornece strings que contêm apenas espaços em branco
+        void deveRetornarNullSeMatriculaForInvalida(String matriculaInvalida) {
+
+            // Act
+            Aluno resultado = usuarioService.buscarAlunoPorMatricula(matriculaInvalida);
+
+            // Assert
+            assertNull(resultado);
+            verifyNoInteractions(alunoDAO);
+        }
+
+
 
 
     }
