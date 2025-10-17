@@ -57,7 +57,7 @@ ProjetoAAGIS/
 
 ### Pré-requisitos
 
-* JDK 22 ou superior
+* JDK 21
 * IDE Java (IntelliJ, Eclipse, VS Code) ou terminal com Java configurado
 
 ### Passos

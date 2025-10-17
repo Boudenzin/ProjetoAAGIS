@@ -1,6 +1,7 @@
 package service;
 
 import dao.TurmaDAO;
+import exceptions.TurmaJaCriadaException;
 import model.Aluno;
 import model.AlunoTurma;
 import model.Professor;
@@ -18,7 +19,20 @@ public class TurmaService {
         this.turmaDAO = turmaDAO;
     }
 
-    public void criarTurma(String nome, Professor professor) throws IOException {
+    public void criarTurma(String nome, Professor professor) throws IOException, Exception {
+
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("Nome da turma não pode ser nulo ou vazio.");
+        }
+
+        if (professor == null) {
+            throw new IllegalArgumentException("Professor não pode ser nulo.");
+        }
+
+        if (turmaDAO.buscar(nome) != null) {
+            throw new TurmaJaCriadaException("Turma com o nome '" + nome + "' já existe."); // <-- MUDANÇA AQUI
+        }
+
         Turma nova = new Turma(nome, professor);
         turmaDAO.salvar(nova);
     }

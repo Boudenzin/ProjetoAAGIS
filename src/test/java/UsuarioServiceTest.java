@@ -37,6 +37,8 @@ class UsuarioServiceTest {
     @Nested
     class TestesDeProfessor {
 
+        //TODO: Colocar mensagens em todos os asserts
+
         private static final String USUARIO_EINSTEIN = "einstein";
         private static final String SENHA_PLANA = "senha123";
         private static final String NOME_EINSTEIN = "Albert Einstein";
