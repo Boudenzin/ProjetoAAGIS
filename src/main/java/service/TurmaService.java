@@ -1,7 +1,9 @@
 package service;
 
 import dao.TurmaDAO;
+import exceptions.NotaInvalidaException;
 import exceptions.TurmaJaCriadaException;
+import exceptions.UnidadeInvalidaException;
 import model.Aluno;
 import model.AlunoTurma;
 import model.Professor;
@@ -19,7 +21,7 @@ public class TurmaService {
         this.turmaDAO = turmaDAO;
     }
 
-    public void criarTurma(String nome, Professor professor) throws IOException, Exception {
+    public void criarTurma(String nome, Professor professor) throws IOException, TurmaJaCriadaException {
 
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("Nome da turma não pode ser nulo ou vazio.");
@@ -53,7 +55,15 @@ public class TurmaService {
         turmaDAO.salvar(turma);
     }
 
-    public void atualizarNota(String nomeTurma, String matriculaAluno, Integer unidade, double novaNota) throws IOException {
+    public void atualizarNota(String nomeTurma, String matriculaAluno, Integer unidade, double novaNota) throws IOException, NotaInvalidaException, UnidadeInvalidaException {
+
+        if (unidade < 1 || unidade > 4) {
+            throw new UnidadeInvalidaException("A unidade deve estar entre 1 e 4.");
+        }
+        if (novaNota < 0 || novaNota > 10) {
+            throw new NotaInvalidaException("A nota deve estar entre 0 e 10.");
+        }
+
         Turma turma = turmaDAO.buscar(nomeTurma);
         Optional<AlunoTurma> alunoTurma = turma.getParticipantes()
                 .stream()

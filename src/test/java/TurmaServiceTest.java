@@ -41,7 +41,7 @@ public class TurmaServiceTest {
         }
 
         @Test
-        void deveCriarTurmaComSucessoQuandoDadosValidos() throws IOException {
+        void deveCriarTurmaComSucessoQuandoDadosValidos() throws IOException, TurmaJaCriadaException {
 
             //Act
             turmaService.criarTurma(nomeTurmaValido, professorValido);

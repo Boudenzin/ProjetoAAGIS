@@ -1,5 +1,6 @@
 package gui;
 
+import exceptions.TurmaJaCriadaException;
 import model.Professor;
 import model.Turma;
 import service.TurmaService;
@@ -36,7 +37,11 @@ public class TelaCadastroTurma extends JFrame {
                 JOptionPane.showMessageDialog(this, "Turma cadastrada com sucesso!");
                 new TelaProfessor(usuarioService, turmaService, professor).setVisible(true);
                 dispose();
-            } catch (IOException ex) {
+            } catch (TurmaJaCriadaException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Cadastro", JOptionPane.WARNING_MESSAGE);
+            }
+
+            catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Erro ao salvar a turma: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
