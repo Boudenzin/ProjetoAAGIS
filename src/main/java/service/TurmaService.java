@@ -1,9 +1,7 @@
 package service;
 
 import dao.TurmaDAO;
-import exceptions.NotaInvalidaException;
-import exceptions.TurmaJaCriadaException;
-import exceptions.UnidadeInvalidaException;
+import exceptions.*;
 import model.Aluno;
 import model.AlunoTurma;
 import model.Professor;
@@ -43,9 +41,24 @@ public class TurmaService {
         turmaDAO.remover(nomeTurma);
     }
 
-    public void adicionarAluno(String nomeTurma, Aluno aluno) throws IOException {
+    public void adicionarAluno(String nomeTurma, Aluno aluno) throws IOException, TurmaNaoEncontradaException, AlunoJaMatriculadoException {
+
+
+        if (aluno == null) {
+            throw new IllegalArgumentException("O aluno não pode ser nulo.");
+        }
+
+        if (nomeTurma == null || nomeTurma.isBlank()) {
+            throw new IllegalArgumentException("O nome da turma não pode ser nulo ou vazio.");
+        }
+
         Turma turma = turmaDAO.buscar(nomeTurma);
-        turma.adicionarAluno(aluno, nomeTurma);
+
+        if (turma == null) {
+            throw new TurmaNaoEncontradaException("A turma '" + nomeTurma + "' não foi encontrada.");
+        }
+
+        turma.adicionarAluno(aluno);
         turmaDAO.salvar(turma);
     }
 

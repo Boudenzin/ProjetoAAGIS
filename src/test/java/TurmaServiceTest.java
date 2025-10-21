@@ -1,5 +1,8 @@
 import dao.TurmaDAO;
+import exceptions.AlunoJaMatriculadoException;
 import exceptions.TurmaJaCriadaException;
+import exceptions.TurmaNaoEncontradaException;
+import model.Aluno;
 import model.Professor;
 import model.Turma;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,9 +65,7 @@ public class TurmaServiceTest {
         void deveLancarExcecaoAoCriarTurmaComProfessorNulo() {
 
             //Act & Assert
-            assertThrows(IllegalArgumentException.class, () -> {
-                turmaService.criarTurma(nomeTurmaValido, null);
-            });
+            assertThrows(IllegalArgumentException.class, () -> turmaService.criarTurma(nomeTurmaValido, null));
 
             verifyNoInteractions(turmaDAO);
         }
@@ -74,9 +75,7 @@ public class TurmaServiceTest {
         void deveLancarExcecaoAoCriarTurmaComNomeInvalido(String nomeInvalido) {
 
             // Act & Assert
-            assertThrows(IllegalArgumentException.class, () -> {
-                turmaService.criarTurma(nomeInvalido, professorValido);
-            });
+            assertThrows(IllegalArgumentException.class, () -> turmaService.criarTurma(nomeInvalido, professorValido));
 
             verifyNoInteractions(turmaDAO);
 
@@ -100,4 +99,79 @@ public class TurmaServiceTest {
         }
 
     }
+
+    @Nested
+    class TestesAdicionarAluno {
+
+        private Professor professorValido;
+        private Aluno alunoValido;
+        private Turma turmaValida;
+        private String nomeTurmaValido;
+
+
+        @BeforeEach
+        void setUp() {
+            professorValido = new Professor("Eric Farias", "1903", "Física", "ericfr", "senha");
+            alunoValido = new Aluno("Isaac Newton", "1687", "Matemática", "newton", "senha");
+            nomeTurmaValido = "Física Quântica I";
+
+            turmaValida = new Turma(nomeTurmaValido, professorValido);
+        }
+
+        @Test
+        void deveAdicionarAlunoComSucessoEmTurmaExistente() throws Exception {
+
+            //Arrange
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            //Act
+            turmaService.adicionarAluno(nomeTurmaValido, alunoValido);
+
+            //Assert
+            verify(turmaDAO, times(1)).salvar(turmaValida);
+
+            assertEquals(1, turmaValida.getParticipantes().size());
+            assertEquals(alunoValido, turmaValida.getParticipantes().getFirst().getAluno());
+        }
+
+        @Test
+        void deveLancarExcecaoAoAdicionarAlunoEmTurmaInexistente() throws IOException {
+
+            //Arrange
+            String nomeInexistente = "Turma Fantasma";
+            when(turmaDAO.buscar(nomeInexistente)).thenReturn(null);
+
+            //Act & Assert
+            assertThrows(TurmaNaoEncontradaException.class, () -> turmaService.adicionarAluno(nomeInexistente, alunoValido));
+
+            verify(turmaDAO, never()).salvar(any(Turma.class));
+        }
+
+        @Test
+        void deveLancarExcecaoAoAdicionarAlunoNulo() throws IOException {
+
+            //Act & Assert
+            assertThrows(IllegalArgumentException.class, () -> turmaService.adicionarAluno(nomeTurmaValido, null));
+
+
+            verify(turmaDAO, never()).salvar(any(Turma.class));
+        }
+
+        @Test
+        void deveLancarExcecaoAoAdicionarAlunoJaeExistenteNaTurma() throws IOException, AlunoJaMatriculadoException {
+
+            //Arrange
+            turmaValida.adicionarAluno(alunoValido);
+
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            //Act & Assert
+            assertThrows(AlunoJaMatriculadoException.class, () -> turmaService.adicionarAluno(nomeTurmaValido, alunoValido));
+
+            verify(turmaDAO, never()).salvar(any(Turma.class));
+        }
+
+
+    }
+
 }

@@ -1,5 +1,7 @@
 package gui;
 
+import exceptions.AlunoJaMatriculadoException;
+import exceptions.TurmaNaoEncontradaException;
 import model.Aluno;
 import model.Professor;
 import model.Turma;
@@ -56,8 +58,26 @@ public class TelaVincularAluno extends JFrame {
             try {
                 turmaService.adicionarAluno(nomeTurma, aluno);
                 JOptionPane.showMessageDialog(this, "Aluno adicionado com sucesso!");
+
+            } catch (TurmaNaoEncontradaException | AlunoJaMatriculadoException ex) {
+
+                JOptionPane.showMessageDialog(this,
+                        ex.getMessage(), // <-- A MÁGICA ACONTECE AQUI
+                        "Aviso de Matrícula",
+                        JOptionPane.WARNING_MESSAGE);
+
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "Erro ao adicionar aluno: " + ex.getMessage());
+
+                JOptionPane.showMessageDialog(this,
+                        "Erro inesperado ao salvar os dados: " + ex.getMessage(),
+                        "Erro de Arquivo",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Ocorreu um erro: " + ex.getMessage(),
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 

@@ -1,5 +1,7 @@
 package model;
 
+import exceptions.AlunoJaMatriculadoException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +17,17 @@ public class Turma implements Serializable {
         this.participantes = new ArrayList<>();
     }
 
-    public void adicionarAluno(Aluno aluno, String nomeTurma) {
-        participantes.add(new AlunoTurma(aluno, nomeTurma));
+    public void adicionarAluno(Aluno aluno) throws AlunoJaMatriculadoException {
+
+        boolean jaMatriculado = this.participantes.stream()
+                .anyMatch(alunoTurma -> alunoTurma.getAluno().equals(aluno));
+
+        if (jaMatriculado) {
+            throw new AlunoJaMatriculadoException("O aluno " + aluno.getNome() + " já está matriculado nesta turma.");
+        }
+
+        AlunoTurma novoAlunoTurma = new AlunoTurma(aluno, this.nome); // Usando o nome da própria turma
+        this.participantes.add(novoAlunoTurma);
     }
 
     public List<AlunoTurma> getParticipantes() {
