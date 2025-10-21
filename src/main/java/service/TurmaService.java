@@ -62,8 +62,21 @@ public class TurmaService {
         turmaDAO.salvar(turma);
     }
 
-    public void removerAluno(String nomeTurma, String matriculaAluno) throws IOException {
+    public void removerAluno(String nomeTurma, String matriculaAluno) throws IOException, TurmaNaoEncontradaException {
+
+        if (nomeTurma == null || nomeTurma.isBlank()) {
+            throw new IllegalArgumentException("O nome da turma não pode ser nulo ou vazio.");
+        }
+        if (matriculaAluno == null || matriculaAluno.isBlank()) {
+            throw new IllegalArgumentException("A matrícula do aluno não pode ser nula ou vazia.");
+        }
+
         Turma turma = turmaDAO.buscar(nomeTurma);
+
+        if (turma == null) {
+            throw new TurmaNaoEncontradaException("A turma '" + nomeTurma + "' não foi encontrada.");
+        }
+
         turma.getParticipantes().removeIf(p -> p.getAluno().getMatricula().equals(matriculaAluno));
         turmaDAO.salvar(turma);
     }

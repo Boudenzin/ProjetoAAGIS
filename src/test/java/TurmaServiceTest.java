@@ -174,4 +174,101 @@ public class TurmaServiceTest {
 
     }
 
+    @Nested
+    class TestesRemoverAluno {
+
+        private Professor professorValido;
+        private Aluno alunoParaRemover;
+        private Turma turmaValida;
+        private String nomeTurmaValido;
+        private String matriculaParaRemover;
+
+        @BeforeEach
+        void setUp() throws AlunoJaMatriculadoException {
+
+            professorValido = new Professor("Eric Farias", "1903", "Física", "ericfr", "senha");
+            alunoParaRemover = new Aluno("Isaac Newton", "1687", "Matemática", "newton", "senha");
+            nomeTurmaValido = "Física Quântica I";
+            matriculaParaRemover = "1687";
+
+            turmaValida = new Turma(nomeTurmaValido, professorValido);
+
+            turmaValida.adicionarAluno(alunoParaRemover);
+        }
+
+        @Test
+        void deveRemoverAlunoComSucessoDeTurmaExistente() throws Exception {
+
+            //Arrange
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            assertEquals(1, turmaValida.getParticipantes().size());
+
+            //Act
+            turmaService.removerAluno(nomeTurmaValido, matriculaParaRemover);
+
+            //Assert
+            verify(turmaDAO, times(1)).salvar(turmaValida);
+            assertEquals(0, turmaValida.getParticipantes().size());
+        }
+
+        @Test
+        void naoDeveFalharAoRemoverAlunoInexistenteDaTurma() throws Exception {
+            //Arrange
+            String matriculaInexistente = "9999";
+
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            //Act
+            assertDoesNotThrow(() -> turmaService.removerAluno(nomeTurmaValido, matriculaInexistente));
+
+            //Assert
+            verify(turmaDAO, times(1)).salvar(turmaValida);
+            // 2. O aluno original ("1687") AINDA deve estar na turma.
+            assertEquals(1, turmaValida.getParticipantes().size());
+
+        }
+
+        @Test
+        void deveLancarExcecaoAoRemoverAlunoDeTurmaInexistente() throws IOException {
+            // Arrange
+            String nomeTurmaInexistente = "Turma Fantasma";
+            // Simulamos que o DAO não encontra a turma, retornando null.
+            when(turmaDAO.buscar(nomeTurmaInexistente)).thenReturn(null);
+
+            // Act & Assert
+            // Esperamos que o serviço lance nossa exceção customizada.
+            assertThrows(TurmaNaoEncontradaException.class, () -> {
+                turmaService.removerAluno(nomeTurmaInexistente, matriculaParaRemover);
+            });
+
+            // Garantimos que o 'salvar' NUNCA foi chamado.
+            verify(turmaDAO, never()).salvar(any(Turma.class));
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource // Testa com null e string vazia ""
+        void deveLancarExcecaoParaEntradasInvalidas(String inputInvalido) {
+
+            // Act & Assert
+
+            // Teste 1: Nome da turma inválido
+            assertThrows(IllegalArgumentException.class, () -> {
+                turmaService.removerAluno(inputInvalido, matriculaParaRemover);
+            });
+
+            // Teste 2: Matrícula do aluno inválida
+            assertThrows(IllegalArgumentException.class, () -> {
+                turmaService.removerAluno(nomeTurmaValido, inputInvalido);
+            });
+
+            // Garantimos que o DAO não foi chamado nenhuma vez
+            verifyNoInteractions(turmaDAO);
+        }
+
+
+
+
+    }
+
 }
