@@ -37,7 +37,34 @@ public class TurmaService {
         turmaDAO.salvar(nova);
     }
 
-    public void removerTurma(String nomeTurma) throws IOException {
+    /**
+     * Remove uma turma, mas APENAS se o professor logado for o dono da turma.
+     *
+     * @param nomeTurma Nome da turma a ser removida.
+     * @param professorLogado O professor que está tentando executar a ação.
+     * @throws IOException Em caso de erro de I/O.
+     * @throws TurmaNaoEncontradaException Se a turma não existir.
+     * @throws AutorizacaoException Se o professor logado não for o dono da turma.
+     */
+    public void removerTurma(String nomeTurma, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AutorizacaoException {
+
+        if (nomeTurma == null || nomeTurma.isBlank()) {
+            throw new IllegalArgumentException("O nome da turma não pode ser nulo ou vazio.");
+        }
+        if (professorLogado == null) {
+            throw new IllegalArgumentException("Professor logado não pode ser nulo.");
+        }
+
+        Turma turma = turmaDAO.buscar(nomeTurma);
+
+        if (turma == null) {
+            throw new TurmaNaoEncontradaException("A turma '" + nomeTurma + "' não foi encontrada.");
+        }
+
+        if (!turma.getProfessor().getUsuario().equals(professorLogado.getUsuario())) {
+            throw new AutorizacaoException("Permissão negada. Você não é o professor desta turma.");
+        }
+
         turmaDAO.remover(nomeTurma);
     }
 
