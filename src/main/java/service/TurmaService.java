@@ -30,7 +30,7 @@ public class TurmaService {
         }
 
         if (turmaDAO.buscar(nome) != null) {
-            throw new TurmaJaCriadaException("Turma com o nome '" + nome + "' já existe."); // <-- MUDANÇA AQUI
+            throw new TurmaJaCriadaException("Turma com o nome '" + nome + "' já existe.");
         }
 
         Turma nova = new Turma(nome, professor);
@@ -39,76 +39,48 @@ public class TurmaService {
 
     /**
      * Remove uma turma, mas APENAS se o professor logado for o dono da turma.
+     * Utiliza o método auxiliar buscarEAutorizar para garantir a segurança.
      *
      * @param nomeTurma Nome da turma a ser removida.
-     * @param professorLogado O professor que está tentando executar a ação.
+     * @param professorLogado O professor que tenta executar a ação.
      * @throws IOException Em caso de erro de I/O.
      * @throws TurmaNaoEncontradaException Se a turma não existir.
      * @throws AutorizacaoException Se o professor logado não for o dono da turma.
+     * @throws IllegalArgumentException Se as entradas forem nulas/vazias.
      */
     public void removerTurma(String nomeTurma, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AutorizacaoException {
 
-        if (nomeTurma == null || nomeTurma.isBlank()) {
-            throw new IllegalArgumentException("O nome da turma não pode ser nulo ou vazio.");
-        }
-        if (professorLogado == null) {
-            throw new IllegalArgumentException("Professor logado não pode ser nulo.");
-        }
-
-        Turma turma = turmaDAO.buscar(nomeTurma);
-
-        if (turma == null) {
-            throw new TurmaNaoEncontradaException("A turma '" + nomeTurma + "' não foi encontrada.");
-        }
-
-        if (!turma.getProfessor().getUsuario().equals(professorLogado.getUsuario())) {
-            throw new AutorizacaoException("Permissão negada. Você não é o professor desta turma.");
-        }
+        buscarEAutorizar(nomeTurma, professorLogado);
 
         turmaDAO.remover(nomeTurma);
     }
 
-    public void adicionarAluno(String nomeTurma, Aluno aluno) throws IOException, TurmaNaoEncontradaException, AlunoJaMatriculadoException {
+    public void adicionarAluno(String nomeTurma, Aluno aluno, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AlunoJaMatriculadoException, AutorizacaoException {
 
 
         if (aluno == null) {
             throw new IllegalArgumentException("O aluno não pode ser nulo.");
         }
 
-        if (nomeTurma == null || nomeTurma.isBlank()) {
-            throw new IllegalArgumentException("O nome da turma não pode ser nulo ou vazio.");
-        }
-
-        Turma turma = turmaDAO.buscar(nomeTurma);
-
-        if (turma == null) {
-            throw new TurmaNaoEncontradaException("A turma '" + nomeTurma + "' não foi encontrada.");
-        }
+        Turma turma = buscarEAutorizar(nomeTurma, professorLogado);
 
         turma.adicionarAluno(aluno);
         turmaDAO.salvar(turma);
     }
 
-    public void removerAluno(String nomeTurma, String matriculaAluno) throws IOException, TurmaNaoEncontradaException {
+    public void removerAluno(String nomeTurma, String matriculaAluno, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AutorizacaoException, AlunoNaoEncontradoException {
 
-        if (nomeTurma == null || nomeTurma.isBlank()) {
-            throw new IllegalArgumentException("O nome da turma não pode ser nulo ou vazio.");
-        }
         if (matriculaAluno == null || matriculaAluno.isBlank()) {
             throw new IllegalArgumentException("A matrícula do aluno não pode ser nula ou vazia.");
         }
 
-        Turma turma = turmaDAO.buscar(nomeTurma);
+        Turma turma = buscarEAutorizar(nomeTurma, professorLogado);
 
-        if (turma == null) {
-            throw new TurmaNaoEncontradaException("A turma '" + nomeTurma + "' não foi encontrada.");
-        }
-
-        turma.getParticipantes().removeIf(p -> p.getAluno().getMatricula().equals(matriculaAluno));
+        turma.removerAlunoPorMatricula(matriculaAluno);
         turmaDAO.salvar(turma);
     }
 
-    public void atualizarNota(String nomeTurma, String matriculaAluno, Integer unidade, double novaNota) throws IOException, NotaInvalidaException, UnidadeInvalidaException {
+    public void atualizarNota(String nomeTurma, String matriculaAluno, Integer unidade, double novaNota, Professor professorLogado) throws IOException, NotaInvalidaException, UnidadeInvalidaException, TurmaNaoEncontradaException, AutorizacaoException, AlunoNaoEncontradoException {
 
         if (unidade < 1 || unidade > 4) {
             throw new UnidadeInvalidaException("A unidade deve estar entre 1 e 4.");
@@ -116,30 +88,39 @@ public class TurmaService {
         if (novaNota < 0 || novaNota > 10) {
             throw new NotaInvalidaException("A nota deve estar entre 0 e 10.");
         }
+        if (matriculaAluno == null || matriculaAluno.isBlank()) {
+            throw new IllegalArgumentException("A matrícula do aluno não pode ser nula ou vazia.");
+        }
 
-        Turma turma = turmaDAO.buscar(nomeTurma);
-        Optional<AlunoTurma> alunoTurma = turma.getParticipantes()
-                .stream()
-                .filter(p -> p.getAluno().getMatricula().equals(matriculaAluno))
-                .findFirst();
+        Turma turma = buscarEAutorizar(nomeTurma, professorLogado);
 
-        alunoTurma.ifPresent(at -> at.setNotaDaUnidade(unidade, novaNota));
+        turma.atualizarNotaDoAluno(matriculaAluno, unidade, novaNota);
+
         turmaDAO.salvar(turma);
     }
 
-    public void atualizarFaltas(String nomeTurma, String matriculaAluno, int novasFaltas) throws IOException {
-        Turma turma = turmaDAO.buscar(nomeTurma);
-        Optional<AlunoTurma> alunoTurma = turma.getParticipantes()
-                .stream()
-                .filter(p -> p.getAluno().getMatricula().equals(matriculaAluno))
-                .findFirst();
+    public void atualizarFaltas(String nomeTurma, String matriculaAluno, int novasFaltas, Professor professorLogado) throws IOException, AutorizacaoException, TurmaNaoEncontradaException, AlunoNaoEncontradoException {
 
-        alunoTurma.ifPresent(at -> at.setFaltas(novasFaltas));
+        if (novasFaltas < 0) {
+            throw new IllegalArgumentException("O número de faltas não pode ser negativo.");
+        }
+        if (matriculaAluno == null || matriculaAluno.isBlank()) {
+            throw new IllegalArgumentException("A matrícula do aluno não pode ser nula ou vazia.");
+        }
+
+
+        Turma turma = buscarEAutorizar(nomeTurma, professorLogado);
+
+        turma.atualizarFaltasDoAluno(matriculaAluno, novasFaltas);
+
         turmaDAO.salvar(turma);
     }
 
-    public List<AlunoTurma> listarAlunos(String nomeTurma) throws IOException {
-        Turma turma = turmaDAO.buscar(nomeTurma);
+    public List<AlunoTurma> listarAlunos(String nomeTurma, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AutorizacaoException {
+
+
+        Turma turma = buscarEAutorizar(nomeTurma, professorLogado);
+
         return turma.getParticipantes();
     }
 
@@ -158,6 +139,7 @@ public class TurmaService {
     public Turma buscarTurma(String nomeTurma) throws IOException {
         return turmaDAO.buscar(nomeTurma);
     }
+
     public List<Turma> getTurmasDoAluno(Aluno aluno) throws IOException {
         List<Turma> turmas = this.listarTodasTurmas();
         return turmas.stream()
@@ -165,5 +147,47 @@ public class TurmaService {
                         .anyMatch(alunoTurma -> alunoTurma.getAluno().equals(aluno)))
                 .toList();
     }
+
+
+    /**
+     * Metodo auxiliar privado para buscar uma turma, validar a sua existência
+     * e garantir que o professor logado é o dono.
+     * @param nomeTurma Nome da turma a ser buscada.
+     * @param professorLogado Professor que tenta a ação.
+     * @return A Turma, se for encontrada e autorizada.
+     * @throws TurmaNaoEncontradaException Se a turma não existir.
+     * @throws AutorizacaoException Se o professor não for o dono.
+     * @throws IllegalArgumentException Se as entradas forem nulas/vazias.
+     */
+
+    private Turma buscarEAutorizar(String nomeTurma, Professor professorLogado)
+            throws TurmaNaoEncontradaException, AutorizacaoException, IllegalArgumentException {
+
+        if (nomeTurma == null || nomeTurma.isBlank()) {
+            throw new IllegalArgumentException("O nome da turma não pode ser nulo ou vazio.");
+        }
+        if (professorLogado == null) {
+            throw new IllegalArgumentException("Professor logado não pode ser nulo.");
+        }
+
+        Turma turma;
+        try {
+            turma = turmaDAO.buscar(nomeTurma);
+        } catch (IOException e) {
+            throw new PersistenciaException("Erro de persistência ao buscar turma: " + e.getMessage(), e);
+        }
+
+        if (turma == null) {
+            throw new TurmaNaoEncontradaException("A turma '" + nomeTurma + "' não foi encontrada.");
+        }
+
+        if (!turma.getProfessor().getUsuario().equals(professorLogado.getUsuario())) {
+            throw new AutorizacaoException("Permissão negada. Você não é o professor desta turma.");
+        }
+
+        return turma;
+    }
+
+
 
 }

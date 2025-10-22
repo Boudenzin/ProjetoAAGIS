@@ -1,10 +1,12 @@
 package model;
 
 import exceptions.AlunoJaMatriculadoException;
+import exceptions.AlunoNaoEncontradoException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Turma implements Serializable {
     private String nome;
@@ -57,5 +59,46 @@ public class Turma implements Serializable {
     public String toString() {
         return nome + " - " + professor.getNome();
     }
+
+    /**
+     * Busca um participante (AlunoTurma) dentro da lista da turma
+     * com base na matrícula do aluno.
+     *
+     * @param matriculaAluno A matrícula a ser buscada.
+     * @return um Optional contendo o AlunoTurma se encontrado, ou Optional.empty() se não.
+     */
+    public Optional<AlunoTurma> getParticipantePorMatricula(String matriculaAluno) {
+        if (matriculaAluno == null || matriculaAluno.isBlank()) {
+            return Optional.empty();
+        }
+
+        return this.participantes.stream()
+                .filter(p -> p.getAluno().getMatricula().equals(matriculaAluno))
+                .findFirst();
+    }
+
+    public void atualizarNotaDoAluno(String matricula, int unidade, double nota) throws AlunoNaoEncontradoException {
+        AlunoTurma at = getParticipantePorMatricula(matricula)
+                .orElseThrow(() -> new AlunoNaoEncontradoException("Aluno com matrícula " + matricula + " não encontrado nesta turma."));
+
+        at.setNotaDaUnidade(unidade, nota);
+    }
+
+    public void atualizarFaltasDoAluno(String matricula, int faltas) throws AlunoNaoEncontradoException {
+
+        AlunoTurma at = getParticipantePorMatricula(matricula)
+                .orElseThrow(() -> new AlunoNaoEncontradoException("Aluno com matrícula " + matricula + " não encontrado nesta turma."));
+
+        at.setFaltas(faltas);
+    }
+
+    public void removerAlunoPorMatricula(String matricula) throws AlunoNaoEncontradoException {
+        boolean removido = this.participantes.removeIf(p -> p.getAluno().getMatricula().equals(matricula));
+
+        if (!removido) {
+            throw new AlunoNaoEncontradoException("Aluno com matrícula " + matricula + " não foi encontrado nessa turma.");
+        }
+    }
+
 
 }
