@@ -8,6 +8,7 @@ import model.Professor;
 import model.Turma;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class TurmaService {
         }
 
         Turma nova = new Turma(nome, professor);
-        turmaDAO.salvar(nova);
+        salvarTurma(nova);
     }
 
     /**
@@ -48,14 +49,14 @@ public class TurmaService {
      * @throws AutorizacaoException Se o professor logado não for o dono da turma.
      * @throws IllegalArgumentException Se as entradas forem nulas/vazias.
      */
-    public void removerTurma(String nomeTurma, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AutorizacaoException {
+    public void removerTurma(String nomeTurma, Professor professorLogado) throws TurmaNaoEncontradaException, AutorizacaoException {
 
         buscarEAutorizar(nomeTurma, professorLogado);
 
-        turmaDAO.remover(nomeTurma);
+        removerTurmaDoDAO(nomeTurma);
     }
 
-    public void adicionarAluno(String nomeTurma, Aluno aluno, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AlunoJaMatriculadoException, AutorizacaoException {
+    public void adicionarAluno(String nomeTurma, Aluno aluno, Professor professorLogado) throws TurmaNaoEncontradaException, AlunoJaMatriculadoException, AutorizacaoException {
 
 
         if (aluno == null) {
@@ -65,10 +66,10 @@ public class TurmaService {
         Turma turma = buscarEAutorizar(nomeTurma, professorLogado);
 
         turma.adicionarAluno(aluno);
-        turmaDAO.salvar(turma);
+        salvarTurma(turma);
     }
 
-    public void removerAluno(String nomeTurma, String matriculaAluno, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AutorizacaoException, AlunoNaoEncontradoException {
+    public void removerAluno(String nomeTurma, String matriculaAluno, Professor professorLogado) throws TurmaNaoEncontradaException, AutorizacaoException, AlunoNaoEncontradoException {
 
         if (matriculaAluno == null || matriculaAluno.isBlank()) {
             throw new IllegalArgumentException("A matrícula do aluno não pode ser nula ou vazia.");
@@ -77,10 +78,10 @@ public class TurmaService {
         Turma turma = buscarEAutorizar(nomeTurma, professorLogado);
 
         turma.removerAlunoPorMatricula(matriculaAluno);
-        turmaDAO.salvar(turma);
+        salvarTurma(turma);
     }
 
-    public void atualizarNota(String nomeTurma, String matriculaAluno, Integer unidade, double novaNota, Professor professorLogado) throws IOException, NotaInvalidaException, UnidadeInvalidaException, TurmaNaoEncontradaException, AutorizacaoException, AlunoNaoEncontradoException {
+    public void atualizarNota(String nomeTurma, String matriculaAluno, Integer unidade, double novaNota, Professor professorLogado) throws NotaInvalidaException, UnidadeInvalidaException, TurmaNaoEncontradaException, AutorizacaoException, AlunoNaoEncontradoException {
 
         if (unidade < 1 || unidade > 4) {
             throw new UnidadeInvalidaException("A unidade deve estar entre 1 e 4.");
@@ -96,10 +97,10 @@ public class TurmaService {
 
         turma.atualizarNotaDoAluno(matriculaAluno, unidade, novaNota);
 
-        turmaDAO.salvar(turma);
+        salvarTurma(turma);
     }
 
-    public void atualizarFaltas(String nomeTurma, String matriculaAluno, int novasFaltas, Professor professorLogado) throws IOException, AutorizacaoException, TurmaNaoEncontradaException, AlunoNaoEncontradoException {
+    public void atualizarFaltas(String nomeTurma, String matriculaAluno, int novasFaltas, Professor professorLogado) throws AutorizacaoException, TurmaNaoEncontradaException, AlunoNaoEncontradoException {
 
         if (novasFaltas < 0) {
             throw new IllegalArgumentException("O número de faltas não pode ser negativo.");
@@ -113,15 +114,15 @@ public class TurmaService {
 
         turma.atualizarFaltasDoAluno(matriculaAluno, novasFaltas);
 
-        turmaDAO.salvar(turma);
+        salvarTurma(turma);
     }
 
-    public List<AlunoTurma> listarAlunos(String nomeTurma, Professor professorLogado) throws IOException, TurmaNaoEncontradaException, AutorizacaoException {
+    public List<AlunoTurma> listarAlunos(String nomeTurma, Professor professorLogado) throws TurmaNaoEncontradaException, AutorizacaoException {
 
 
         Turma turma = buscarEAutorizar(nomeTurma, professorLogado);
 
-        return turma.getParticipantes();
+        return Collections.unmodifiableList(turma.getParticipantes());
     }
 
     public List<Turma> listarTodasTurmas() throws IOException {
@@ -129,10 +130,8 @@ public class TurmaService {
     }
 
     public List<Turma> getTurmasDoProfessor(Professor professor) throws IOException {
-        List<Turma> turmas = this.listarTodasTurmas();
-        return turmas.stream()
-                .filter(turma -> turma.getProfessor().getUsuario().equalsIgnoreCase(professor.getUsuario()))
-                .toList();
+
+        return turmaDAO.listarPorProfessor(professor);
     }
 
 
@@ -141,11 +140,7 @@ public class TurmaService {
     }
 
     public List<Turma> getTurmasDoAluno(Aluno aluno) throws IOException {
-        List<Turma> turmas = this.listarTodasTurmas();
-        return turmas.stream()
-                .filter(turma -> turma.getParticipantes().stream()
-                        .anyMatch(alunoTurma -> alunoTurma.getAluno().equals(aluno)))
-                .toList();
+        return turmaDAO.listarPorAluno(aluno);
     }
 
 
@@ -186,6 +181,22 @@ public class TurmaService {
         }
 
         return turma;
+    }
+
+    private void salvarTurma(Turma turma) {
+        try {
+            turmaDAO.salvar(turma);
+        } catch (IOException e) {
+            throw new PersistenciaException("Erro de persistência ao salvar turma: " + turma.getNome(), e);
+        }
+    }
+
+    private void removerTurmaDoDAO(String nomeTurma) {
+        try {
+            turmaDAO.remover(nomeTurma);
+        } catch (IOException e) {
+            throw new PersistenciaException("Erro de persistência ao remover turma: " + nomeTurma, e);
+        }
     }
 
 

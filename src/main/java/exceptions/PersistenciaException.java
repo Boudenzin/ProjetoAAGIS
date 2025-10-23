@@ -9,6 +9,6 @@ public class PersistenciaException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public PersistenciaException(String message, IOException e) {
-        super(message);
+        super(message, e);
     }
 }

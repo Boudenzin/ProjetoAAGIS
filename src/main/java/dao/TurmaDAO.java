@@ -1,5 +1,7 @@
 package dao;
 
+import model.Aluno;
+import model.Professor;
 import model.Turma;
 
 import java.io.IOException;
@@ -38,10 +40,40 @@ public class TurmaDAO {
         return turmas.stream()
                 .filter(t -> t.getNome().equalsIgnoreCase(nomeTurma))
                 .findFirst()
-                .orElseThrow(() -> new IOException("Turma '" + nomeTurma + "' não encontrada."));
+                .orElse(null);
     }
 
     public List<Turma> listar() {
         return new ArrayList<>(turmas); // Retorna cópia para evitar manipulação externa
     }
+
+    public List<Turma> listarPorProfessor(Professor professor) {
+        List<Turma> turmas = this.listar();
+        List<Turma> turmasDoProfessor = new ArrayList<>();
+
+        for (Turma turma : turmas) {
+            if (turma.getProfessor().equals(professor)) {
+                turmasDoProfessor.add(turma);
+            }
+        }
+
+        return turmasDoProfessor;
+    }
+
+    public List<Turma> listarPorAluno(Aluno aluno) {
+        List<Turma> turmas = this.listar();
+        List<Turma> turmasDoAluno = new ArrayList<>();
+
+        for (Turma turma : turmas) {
+            boolean alunoEstaNaTurma = turma.getParticipantes().stream()
+                    .anyMatch(alunoTurma -> alunoTurma.getAluno().equals(aluno));
+
+            if (alunoEstaNaTurma) {
+
+                turmasDoAluno.add(turma);
+            }
+        }
+        return turmasDoAluno;
+    }
 }
+
