@@ -47,7 +47,7 @@ public class TelaCadastroNota extends JFrame {
                     return;
                 }
 
-                turmaService.atualizarNota(at.getNomeTurma(), at.getAluno().getMatricula(), unidade, nota);
+                turmaService.atualizarNota(at.getNomeTurma(), at.getAluno().getMatricula(), unidade, nota, professor);
                 JOptionPane.showMessageDialog(this, "Nota cadastrada com sucesso!");
 
             } catch (Exception ex) {

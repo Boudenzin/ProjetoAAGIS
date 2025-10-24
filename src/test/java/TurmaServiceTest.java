@@ -1,5 +1,6 @@
 import dao.TurmaDAO;
 import exceptions.AlunoJaMatriculadoException;
+import exceptions.AlunoNaoEncontradoException;
 import exceptions.TurmaJaCriadaException;
 import exceptions.TurmaNaoEncontradaException;
 import model.Aluno;
@@ -90,9 +91,7 @@ public class TurmaServiceTest {
             when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(new Turma(nomeTurmaValido, professorValido));
 
             // Act & Assert
-            assertThrows(TurmaJaCriadaException.class, () -> { // <-- MUDANÇA AQUI
-                turmaService.criarTurma(nomeTurmaValido, professorValido);
-            });
+            assertThrows(TurmaJaCriadaException.class, () -> turmaService.criarTurma(nomeTurmaValido, professorValido));
 
             // Verificamos que o método salvar NUNCA foi chamado, pois a criação foi barrada.
             verify(turmaDAO, never()).salvar(any(Turma.class));
@@ -125,7 +124,7 @@ public class TurmaServiceTest {
             when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
 
             //Act
-            turmaService.adicionarAluno(nomeTurmaValido, alunoValido);
+            turmaService.adicionarAluno(nomeTurmaValido, alunoValido, professorValido);
 
             //Assert
             verify(turmaDAO, times(1)).salvar(turmaValida);
@@ -142,7 +141,7 @@ public class TurmaServiceTest {
             when(turmaDAO.buscar(nomeInexistente)).thenReturn(null);
 
             //Act & Assert
-            assertThrows(TurmaNaoEncontradaException.class, () -> turmaService.adicionarAluno(nomeInexistente, alunoValido));
+            assertThrows(TurmaNaoEncontradaException.class, () -> turmaService.adicionarAluno(nomeInexistente, alunoValido, professorValido));
 
             verify(turmaDAO, never()).salvar(any(Turma.class));
         }
@@ -151,7 +150,7 @@ public class TurmaServiceTest {
         void deveLancarExcecaoAoAdicionarAlunoNulo() throws IOException {
 
             //Act & Assert
-            assertThrows(IllegalArgumentException.class, () -> turmaService.adicionarAluno(nomeTurmaValido, null));
+            assertThrows(IllegalArgumentException.class, () -> turmaService.adicionarAluno(nomeTurmaValido, null, professorValido));
 
 
             verify(turmaDAO, never()).salvar(any(Turma.class));
@@ -166,7 +165,7 @@ public class TurmaServiceTest {
             when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
 
             //Act & Assert
-            assertThrows(AlunoJaMatriculadoException.class, () -> turmaService.adicionarAluno(nomeTurmaValido, alunoValido));
+            assertThrows(AlunoJaMatriculadoException.class, () -> turmaService.adicionarAluno(nomeTurmaValido, alunoValido, professorValido));
 
             verify(turmaDAO, never()).salvar(any(Turma.class));
         }
@@ -205,7 +204,7 @@ public class TurmaServiceTest {
             assertEquals(1, turmaValida.getParticipantes().size());
 
             //Act
-            turmaService.removerAluno(nomeTurmaValido, matriculaParaRemover);
+            turmaService.removerAluno(nomeTurmaValido, matriculaParaRemover, professorValido);
 
             //Assert
             verify(turmaDAO, times(1)).salvar(turmaValida);
@@ -213,15 +212,14 @@ public class TurmaServiceTest {
         }
 
         @Test
-        void naoDeveFalharAoRemoverAlunoInexistenteDaTurma() throws Exception {
+        void deveLancarExcecaoAoRemoverAlunoInexistenteDaTurma() throws Exception {
             //Arrange
             String matriculaInexistente = "9999";
 
             when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
 
             //Act
-            assertDoesNotThrow(() -> turmaService.removerAluno(nomeTurmaValido, matriculaInexistente));
-
+            assertThrows(AlunoNaoEncontradoException.class, () -> turmaService.removerAluno(nomeTurmaValido, matriculaInexistente, professorValido));
             //Assert
             verify(turmaDAO, times(1)).salvar(turmaValida);
             // 2. O aluno original ("1687") AINDA deve estar na turma.
@@ -237,10 +235,8 @@ public class TurmaServiceTest {
             when(turmaDAO.buscar(nomeTurmaInexistente)).thenReturn(null);
 
             // Act & Assert
-            // Esperamos que o serviço lance nossa exceção customizada.
-            assertThrows(TurmaNaoEncontradaException.class, () -> {
-                turmaService.removerAluno(nomeTurmaInexistente, matriculaParaRemover);
-            });
+            // Esperamos que o serviço lance uma exceção customizada.
+            assertThrows(TurmaNaoEncontradaException.class, () -> turmaService.removerAluno(nomeTurmaInexistente, matriculaParaRemover, professorValido));
 
             // Garantimos que o 'salvar' NUNCA foi chamado.
             verify(turmaDAO, never()).salvar(any(Turma.class));
@@ -253,14 +249,10 @@ public class TurmaServiceTest {
             // Act & Assert
 
             // Teste 1: Nome da turma inválido
-            assertThrows(IllegalArgumentException.class, () -> {
-                turmaService.removerAluno(inputInvalido, matriculaParaRemover);
-            });
+            assertThrows(IllegalArgumentException.class, () -> turmaService.removerAluno(inputInvalido, matriculaParaRemover, professorValido));
 
             // Teste 2: Matrícula do aluno inválida
-            assertThrows(IllegalArgumentException.class, () -> {
-                turmaService.removerAluno(nomeTurmaValido, inputInvalido);
-            });
+            assertThrows(IllegalArgumentException.class, () -> turmaService.removerAluno(nomeTurmaValido, inputInvalido, professorValido));
 
             // Garantimos que o DAO não foi chamado nenhuma vez
             verifyNoInteractions(turmaDAO);

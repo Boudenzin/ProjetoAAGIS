@@ -56,22 +56,16 @@ public class TelaVincularAluno extends JFrame {
             }
 
             try {
-                turmaService.adicionarAluno(nomeTurma, aluno);
+                turmaService.adicionarAluno(nomeTurma, aluno, professor);
                 JOptionPane.showMessageDialog(this, "Aluno adicionado com sucesso!");
 
             } catch (TurmaNaoEncontradaException | AlunoJaMatriculadoException ex) {
 
                 JOptionPane.showMessageDialog(this,
-                        ex.getMessage(), // <-- A MÁGICA ACONTECE AQUI
+                        ex.getMessage(),
                         "Aviso de Matrícula",
                         JOptionPane.WARNING_MESSAGE);
 
-            } catch (IOException ex) {
-
-                JOptionPane.showMessageDialog(this,
-                        "Erro inesperado ao salvar os dados: " + ex.getMessage(),
-                        "Erro de Arquivo",
-                        JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
 
                 JOptionPane.showMessageDialog(this,

@@ -41,7 +41,7 @@ public class TelaCadastrarFaltas extends JFrame {
                     return;
                 }
 
-                turmaService.atualizarFaltas(at.getNomeTurma(), at.getAluno().getMatricula(), faltas);
+                turmaService.atualizarFaltas(at.getNomeTurma(), at.getAluno().getMatricula(), faltas, professor);
                 JOptionPane.showMessageDialog(this, "Faltas atualizadas com sucesso!");
 
             } catch (Exception ex) {
