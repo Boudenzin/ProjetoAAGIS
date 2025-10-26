@@ -394,4 +394,67 @@ public class TurmaServiceTest {
             assertInstanceOf(IOException.class, exception.getCause());
         }
     }
+
+    @Nested
+    class TestesDeBuscaEAutorizacao {
+
+        private Professor professorValido;
+        private Professor professorInvasor;
+        private Turma turmaValida;
+        private String nomeTurmaValido;
+
+        @BeforeEach
+        void setUp() {
+            professorValido = new Professor("Eric Farias", "1903", "Física", "ericfr", "senha");
+            professorInvasor = new Professor("Rogério", "1111", "Química", "rogermzr", "senha");
+            nomeTurmaValido = "Física Quântica I";
+            turmaValida = new Turma(nomeTurmaValido, professorValido); // Turma pertence a "mcurie"
+        }
+
+        @Test
+        void deveLancarTurmaNaoEncontradaExceptionSeTurmaNaoExistir() throws IOException {
+
+            //Arrange
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(null);
+
+            //Act & Assert
+            assertThrows(TurmaNaoEncontradaException.class, () -> {
+                turmaService.atualizarNota(nomeTurmaValido, "1687", 1, 10.0, professorValido);
+            });
+        }
+
+        @Test
+        void deveLancarAutorizacaoExceptionSeProfessorNaoForODonoDaTurma() throws IOException {
+
+            //Arrange
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            //Act & Assert
+            assertThrows(AutorizacaoException.class, () -> {
+                turmaService.atualizarNota(nomeTurmaValido, "1687", 1, 10.0, professorInvasor);
+            });
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  "})
+        void deveLancarIllegalArgumentExceptionSeNomeTurmaForNuloOuVazio(String nomeInvalido) {
+
+            // Act & Assert
+            assertThrows(IllegalArgumentException.class, () -> {
+                turmaService.atualizarNota(nomeInvalido, "1687", 1, 10.0, professorValido);
+            });
+        }
+
+        @Test
+        void deveLancarIllegalArgumentExceptionSeProfessorLogadoForNulo() {
+
+            // Act & Assert
+            assertThrows(IllegalArgumentException.class, () -> {
+                turmaService.atualizarNota(nomeTurmaValido, "1687", 1, 10.0, null);
+            });
+        }
+    }
+
+    
 }
