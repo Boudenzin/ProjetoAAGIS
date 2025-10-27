@@ -456,5 +456,116 @@ public class TurmaServiceTest {
         }
     }
 
-    
+    @Nested
+    class TestesAtualizarFaltas {
+
+        // --- Atores e Cenário ---
+        private Professor professorValido;
+        private Aluno alunoValido;
+        private Turma turmaValida;
+        private AlunoTurma alunoTurmaValido;
+
+        // --- Dados Válidos para o Teste ---
+        private String nomeTurmaValido;
+        private String matriculaValida;
+        private int faltasValidas;
+
+        @BeforeEach
+        void setUp() throws AlunoJaMatriculadoException {
+            // 1. Criar os atores principais
+            professorValido = new Professor("Marie Curie", "1903", "Física", "mcurie", "senha");
+            alunoValido = new Aluno("Isaac Newton", "1687", "Matemática", "newton", "senha");
+
+            // 2. Criar a turma (o "cenário")
+            nomeTurmaValido = "Engenharia dos Sólidos";
+            turmaValida = new Turma(nomeTurmaValido, professorValido);
+
+            // 3. Colocar o aluno dentro da turma
+            turmaValida.adicionarAluno(alunoValido);
+
+            // 4. Pegar a referência do "participante" (AlunoTurma) que foi criado
+            matriculaValida = "1687";
+            alunoTurmaValido = turmaValida.getParticipantePorMatricula(matriculaValida)
+                    .orElseThrow(); // É seguro
+
+            // 5. Definir os dados válidos de entrada
+            faltasValidas = 5;
+        }
+
+        @Test
+        void deveAtualizarFaltasComSucessoQuandoDadosSaoValidos() throws Exception {
+
+            //Arrange
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            assertEquals(0, alunoTurmaValido.getFaltas());
+
+            //Act
+            turmaService.atualizarFaltas(nomeTurmaValido, matriculaValida, faltasValidas, professorValido);
+
+            //Assert
+            verify(turmaDAO, times(1)).salvar(turmaValida);
+
+            assertEquals(faltasValidas, alunoTurmaValido.getFaltas());
+        }
+
+        @Test
+        void deveLancarIllegalArgumentExceptionSeFaltasForNegativo() {
+            // Arrange
+            int faltasInvalidas = -1;
+
+            // Act & Assert
+            assertThrows(IllegalArgumentException.class, () -> {
+                turmaService.atualizarFaltas(nomeTurmaValido, matriculaValida, faltasInvalidas, professorValido);
+            });
+
+            // Assert (Extra)
+            verifyNoInteractions(turmaDAO);
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  "})
+        void deveLancarIllegalArgumentExceptionSeMatriculaForNulaOuVazia(String matriculaInvalida) {
+
+            // Act & Assert
+            assertThrows(IllegalArgumentException.class, () -> {
+                turmaService.atualizarFaltas(nomeTurmaValido, matriculaInvalida, faltasValidas, professorValido);
+            });
+
+            // Assert (Extra)
+            verifyNoInteractions(turmaDAO);
+        }
+
+        @Test
+        void deveLancarAlunoNaoEncontradoExceptionSeAlunoNaoEstiverNaTurma() throws Exception {
+            // Arrange
+            String matriculaInexistente = "99999";
+
+
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            assertThrows(AlunoNaoEncontradoException.class, () -> {
+                turmaService.atualizarFaltas(nomeTurmaValido, matriculaInexistente, faltasValidas, professorValido);
+            });
+
+            verify(turmaDAO, never()).salvar(any(Turma.class));
+        }
+
+        @Test
+        void deveLancarPersistenciaExceptionSeHouverErroAoSalvar() throws Exception {
+
+            // Arrange
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            doThrow(new IOException("Erro de Teste")).when(turmaDAO).salvar(any(Turma.class));
+
+            // Act & Assert
+            assertThrows(PersistenciaException.class, () -> {
+                turmaService.atualizarFaltas(nomeTurmaValido, matriculaValida, faltasValidas, professorValido);
+            });
+        }
+    }
+
+
 }
