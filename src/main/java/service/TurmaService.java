@@ -10,7 +10,6 @@ import model.Turma;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class TurmaService {
 
@@ -36,24 +35,6 @@ public class TurmaService {
 
         Turma nova = new Turma(nome, professor);
         salvarTurma(nova);
-    }
-
-    /**
-     * Remove uma turma, mas APENAS se o professor logado for o dono da turma.
-     * Utiliza o método auxiliar buscarEAutorizar para garantir a segurança.
-     *
-     * @param nomeTurma Nome da turma a ser removida.
-     * @param professorLogado O professor que tenta executar a ação.
-     * @throws IOException Em caso de erro de I/O.
-     * @throws TurmaNaoEncontradaException Se a turma não existir.
-     * @throws AutorizacaoException Se o professor logado não for o dono da turma.
-     * @throws IllegalArgumentException Se as entradas forem nulas/vazias.
-     */
-    public void removerTurma(String nomeTurma, Professor professorLogado) throws TurmaNaoEncontradaException, AutorizacaoException {
-
-        buscarEAutorizar(nomeTurma, professorLogado);
-
-        removerTurmaDoDAO(nomeTurma);
     }
 
     public void adicionarAluno(String nomeTurma, Aluno aluno, Professor professorLogado) throws TurmaNaoEncontradaException, AlunoJaMatriculadoException, AutorizacaoException {

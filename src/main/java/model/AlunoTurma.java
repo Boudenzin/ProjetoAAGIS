@@ -24,17 +24,11 @@ public class AlunoTurma implements Serializable {
         return aluno;
     }
 
-    public Map<Integer, Double> getNotasPorUnidade() {
-        return Collections.unmodifiableMap(notasPorUnidade);
-    }
 
     public void setNotaDaUnidade(int unidade, double nota) {
         notasPorUnidade.put(unidade, nota);
     }
 
-    public Double getNotaDaUnidade(int unidade) {
-        return notasPorUnidade.get(unidade); // pode retornar null se ainda não tiver nota
-    }
 
     public int getFaltas() {
         return faltas;
@@ -46,12 +40,6 @@ public class AlunoTurma implements Serializable {
 
     public void adicionarFalta() {
         this.faltas++;
-    }
-
-    public void removerFalta() {
-        if (this.faltas > 0) {
-            this.faltas--;
-        }
     }
 
     public String getNomeTurma() {
@@ -81,5 +69,19 @@ public class AlunoTurma implements Serializable {
     public int hashCode() {
         // Usa os mesmos campos do equals() para gerar o hash
         return Objects.hash(aluno, nomeTurma);
+    }
+
+    public Map<Integer, Double> getNotasPorUnidade() {
+        return Collections.unmodifiableMap(notasPorUnidade);
+    }
+
+    public Double getNotaDaUnidade(int unidade) {
+        return notasPorUnidade.get(unidade); // pode retornar null se ainda não tiver nota
+    }
+
+    public void removerFalta() {
+        if (this.faltas > 0) {
+            this.faltas--;
+        }
     }
 }

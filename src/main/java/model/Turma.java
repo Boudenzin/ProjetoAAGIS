@@ -5,6 +5,7 @@ import exceptions.AlunoNaoEncontradoException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class Turma implements Serializable {
     }
 
     public List<AlunoTurma> getParticipantes() {
-        return participantes;
+        return Collections.unmodifiableList(participantes);
     }
 
     public String getNome() {

@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import service.TurmaService;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -565,6 +566,131 @@ public class TurmaServiceTest {
                 turmaService.atualizarFaltas(nomeTurmaValido, matriculaValida, faltasValidas, professorValido);
             });
         }
+    }
+
+    @Nested
+    class TestesListarAlunos {
+
+        // --- Atores e Cenário ---
+        private Professor professorValido;
+        private Aluno alunoValido;
+        private Turma turmaValida;
+        private AlunoTurma alunoTurmaValido;
+
+        // --- Dados Válidos para o Teste ---
+        private String nomeTurmaValido;
+        private String matriculaValida;
+        private int faltasValidas;
+
+        @BeforeEach
+        void setUp() throws AlunoJaMatriculadoException {
+            // 1. Criar os atores principais
+            professorValido = new Professor("Marie Curie", "1903", "Física", "mcurie", "senha");
+            alunoValido = new Aluno("Isaac Newton", "1687", "Matemática", "newton", "senha");
+
+            // 2. Criar a turma (o "cenário")
+            nomeTurmaValido = "Engenharia dos Sólidos";
+            turmaValida = new Turma(nomeTurmaValido, professorValido);
+
+            // 3. Colocar o aluno dentro da turma
+            turmaValida.adicionarAluno(alunoValido);
+
+            // 4. Pegar a referência do "participante" (AlunoTurma) que foi criado
+            matriculaValida = "1687";
+            alunoTurmaValido = turmaValida.getParticipantePorMatricula(matriculaValida)
+                    .orElseThrow(); // É seguro
+
+            // 5. Definir os dados válidos de entrada
+            faltasValidas = 5;
+        }
+
+        @Test
+        void deveRetornarListaDeAlunosCorretamenteQuandoAutorizado() throws Exception {
+            // Arrange
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+
+            // Act
+            List<AlunoTurma> resultado = turmaService.listarAlunos(nomeTurmaValido, professorValido);
+
+            // Assert
+            assertNotNull(resultado);
+            assertEquals(1, resultado.size()); // 1 aluno foi adicionado no setUp
+            assertEquals("Isaac Newton", resultado.getFirst().getAluno().getNome());
+        }
+
+        @Test
+        void deveRetornarUmaListaNaoModificavel() throws Exception {
+            // Arrange
+            when(turmaDAO.buscar(nomeTurmaValido)).thenReturn(turmaValida);
+            Aluno novoAluno = new Aluno("Novo", "999", "Curso", "novo", "123");
+
+            // Act
+            List<AlunoTurma> resultado = turmaService.listarAlunos(nomeTurmaValido, professorValido);
+
+            // Assert
+            assertThrows(UnsupportedOperationException.class, () -> {
+                resultado.add(new AlunoTurma(novoAluno, nomeTurmaValido)); // Tentando burlar a segurança
+            });
+        }
+    }
+
+    @Nested
+    class TestesListagemAlunos {
+
+        @Test
+        void deveListarTodasAsTurmas() throws IOException {
+            // Arrange
+            List<Turma> listaEsperada = List.of(new Turma("T1", null), new Turma("T2", null));
+            when(turmaDAO.listar()).thenReturn(listaEsperada);
+
+            // Act
+            List<Turma> resultado = turmaService.listarTodasTurmas();
+
+            // Assert
+            assertEquals(listaEsperada, resultado);
+            verify(turmaDAO, times(1)).listar();
+        }
+
+        @Test
+        void deveRetornarTurmasDoProfessor() throws IOException {
+            // Arrange
+            Professor prof = new Professor("Prof", "123", "Depto", "prof", "123");
+            List<Turma> listaEsperada = List.of(new Turma("T1", prof));
+            when(turmaDAO.listarPorProfessor(prof)).thenReturn(listaEsperada);
+
+            // Act
+            List<Turma> resultado = turmaService.getTurmasDoProfessor(prof);
+
+            // Assert
+            assertEquals(listaEsperada, resultado);
+            verify(turmaDAO, times(1)).listarPorProfessor(prof);
+        }
+
+        @Test
+        void deveRetornarTurmaQuandoEncontrada() throws IOException {
+            // Arrange
+            Turma turmaEsperada = new Turma("T1", null);
+            when(turmaDAO.buscar("T1")).thenReturn(turmaEsperada);
+
+            // Act
+            Turma resultado = turmaService.buscarTurma("T1");
+
+            // Assert
+            assertEquals(turmaEsperada, resultado);
+        }
+
+        @Test
+        void deveRetornarNullQuandoTurmaNaoEncontrada() throws IOException {
+            // Arrange
+            when(turmaDAO.buscar("T1")).thenReturn(null);
+
+            // Act
+            Turma resultado = turmaService.buscarTurma("T1");
+
+            // Assert
+            assertNull(resultado);
+        }
+
     }
 
 
