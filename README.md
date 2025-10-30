@@ -93,7 +93,6 @@ java -cp src/main/java gui.TelaInicial
 * [ ] Adicionar remoção de turmas por parte do professor
 * [ ] Integração com banco de dados (ex: SQLite ou MySQL)
 * [ ] Geração de relatórios (PDF ou Excel)
-* [ ] Implementação de testes automatizados com JUnit
 * [ ] Adição de documentação Javadoc
 * [ ] Disponibilizar o sistema online via deploy em nuvem
 
