@@ -6,10 +6,10 @@ import model.Professor;
 import model.Turma;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,9 +74,7 @@ public class TurmaTest {
         List<AlunoTurma> listaDeFora = turmaValida.getParticipantes();
         Aluno outroAluno = new Aluno("Outro", "999", "Curso", "outro", "123");
 
-        assertThrows(UnsupportedOperationException.class, () -> {
-            listaDeFora.add(new AlunoTurma(outroAluno, nomeTurma));
-        });
+        assertThrows(UnsupportedOperationException.class, () -> listaDeFora.add(new AlunoTurma(outroAluno, nomeTurma)));
     }
 
     @Test
@@ -95,10 +93,60 @@ public class TurmaTest {
 
     @Test
     @DisplayName("Deve lançar uma exceção ao remover um aluno que não existe")
-    void deveLancarExcecaoAoRemoverAlunoInexistente() throws AlunoNaoEncontradoException {
+    void deveLancarExcecaoAoRemoverAlunoInexistente() {
 
         //Act & Assert
         assertThrows(AlunoNaoEncontradoException.class, () -> turmaValida.removerAlunoPorMatricula("999"));
+    }
+
+    @Test
+    @DisplayName("Deve encontrar o aluno quando o aluno está na turma")
+    void deveEncontrarParticipanteQuandoEleExiste() throws AlunoJaMatriculadoException {
+
+        //Arrange
+        turmaValida.adicionarAluno(alunoTeste);
+
+        //Act
+        Optional<AlunoTurma> resultadoOptional = turmaValida.getParticipantePorMatricula(alunoTeste.getMatricula());
+
+
+        //Assert
+        assertTrue(resultadoOptional.isPresent(), "O aluno deveria ter sido encontrado.");
+
+        AlunoTurma participanteEncontrado = resultadoOptional.get();
+
+        assertEquals(alunoTeste, participanteEncontrado.getAluno());
+    }
+
+    @Test
+    @DisplayName("Deve retornar Optional vazio quando o aluno não está na turma")
+    void deveRetornarOptionalVazioQuandoAlunoNaoExiste() {
+
+        //Act
+        Optional<AlunoTurma> resultadoOptional = turmaValida.getParticipantePorMatricula("999");
+
+        //Assert
+        assertTrue(resultadoOptional.isEmpty(), "O Optional deveria estar vazio, pois o aluno não existe.");
+    }
+
+    @Test
+    @DisplayName("Deve atualizar a nota com sucesso")
+    void deveAtualizarNotaNormalmente() throws AlunoJaMatriculadoException, AlunoNaoEncontradoException {
+
+        //Arrange
+        turmaValida.adicionarAluno(alunoTeste);
+        int unidade1 = 1;
+        double nota1 = 9.3;
+
+
+        //Act
+        turmaValida.atualizarNotaDoAluno(alunoTeste.getMatricula(), unidade1, nota1);
+
+        //Assert
+        Optional<AlunoTurma> atOptional = turmaValida.getParticipantePorMatricula(alunoTeste.getMatricula());
+        double notaSalva = atOptional.get().getNotaDaUnidade(unidade1);
+
+        assertEquals(nota1, notaSalva);
     }
 
 }
